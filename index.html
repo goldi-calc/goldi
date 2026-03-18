@@ -9199,7 +9199,7 @@ Battle.prototype.endBattle = function(result){
 
 
 // ── Admin accounts — add usernames here ──────────────
-const ADMIN_KEYS = new Set(['admin','superadmin']);
+const ADMIN_KEYS = new Set(['eren','superadmin']);
 function isAdmin(key){ return ADMIN_KEYS.has((key||'').toLowerCase()); }
 function amIAdmin(){ return isAdmin(AUTH.session); }
 
