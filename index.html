@@ -3089,7 +3089,7 @@ body.light .theme-toggle { background:rgba(58,107,196,0.12); border-color:#3a6bc
 
 <script>
 // ── Admin accounts — add usernames here to grant admin access ──
-const ADMIN_KEYS = new Set(['admin','superadmin']);
+const ADMIN_KEYS = new Set(['eren','superadmin']);
 function isAdmin(key){ return ADMIN_KEYS.has((key||'').toLowerCase()); }
 function amIAdmin(){ return isAdmin(AUTH.session); }
 
