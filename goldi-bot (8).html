@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLDI BOT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9973A;--gold-light:#E8C47A;--gold-pale:#F5E6C0;--gold-dim:#8A6520;
+  --deep:#0D0B08;--surface:#13110D;--card:#1A1710;--card2:#201D14;
+  --border:rgba(201,151,58,0.18);--border-strong:rgba(201,151,58,0.38);
+  --text:#EDE6D4;--text-muted:#9E9070;--text-dim:#5A5240;
+  --danger:#C9503A;--danger-bg:rgba(201,80,58,0.12);
+  --success:#5A9C62;--success-bg:rgba(90,156,98,0.12);
+  --blurple:#5865F2;--mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--deep);color:var(--text);font-family:'Crimson Pro',Georgia,serif;font-size:18px;line-height:1.75;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,11,8,0.94);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:60px}
+.nav-brand{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-decoration:none;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-brand .coin{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#E8C47A,#C9973A,#8A6520);display:flex;align-items:center;justify-content:center;font-size:14px;font-family:'Cinzel',serif;color:var(--deep);font-weight:700}
+.nav-links{display:flex;gap:0;margin-left:auto;align-items:center}
+.nav-links a{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);text-decoration:none;padding:0 1rem;height:60px;display:flex;align-items:center;transition:color 0.2s,background 0.2s;white-space:nowrap;border-bottom:2px solid transparent}
+.nav-links a:hover{color:var(--gold-light);background:rgba(201,151,58,0.04)}
+.nav-links a.active{color:var(--gold-light);border-bottom-color:var(--gold)}
+.nav-links a.sep{border-right:0.5px solid var(--border)}
+.discord-login-btn{display:flex;align-items:center;gap:7px;background:var(--blurple);color:#fff!important;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.08em;padding:7px 15px;border-radius:5px;border:none;cursor:pointer;transition:opacity 0.2s;font-weight:600;margin-left:1rem}
+.discord-login-btn:hover{opacity:0.85}
+.nav-user{display:flex;align-items:center;gap:8px;margin-left:1rem}
+.nav-user img{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border-strong)}
+.nav-username{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-light);letter-spacing:0.05em}
+.nav-logout{background:none;border:none;color:var(--text-dim);font-size:13px;cursor:pointer;transition:color 0.2s;padding:0 4px}
+.nav-logout:hover{color:var(--danger)}
+
+/* PAGE ROUTING */
+#app{position:relative;z-index:1}
+.page{display:none;animation:pageIn 0.3s cubic-bezier(0.4,0,0.2,1) both}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOME */
+.home-hero{text-align:center;padding:4rem 2rem 3rem;max-width:800px;margin:0 auto}
+.hero-avatar-wrap{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#E8C47A 0%,#C9973A 50%,#8A6520 100%);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:44px;font-weight:700;color:#13110D;margin:0 auto 1.5rem;box-shadow:0 0 50px rgba(201,151,58,0.3),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;flex-shrink:0}
+.hero-avatar-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0}
+.home-hero h1{font-family:'Cinzel',serif;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:700;color:var(--gold-light);letter-spacing:0.08em;margin-bottom:0.5rem}
+.bot-tag{font-family:var(--mono);font-size:13px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:1.25rem}
+.hero-desc{color:var(--text-muted);font-size:17px;font-style:italic;max-width:520px;margin:0 auto 2rem}
+.hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.hero-badge{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.1em;padding:5px 12px;border-radius:3px;border:0.5px solid}
+.hero-badge.gold{color:var(--gold);border-color:var(--border-strong);background:rgba(201,151,58,0.08)}
+.hero-badge.blue{color:#7289da;border-color:rgba(88,101,242,0.4);background:rgba(88,101,242,0.08)}
+.hero-badge.status{color:var(--text-dim);border-color:var(--border);background:var(--card);display:flex;align-items:center;gap:6px}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-btn{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.1em;padding:12px 28px;border-radius:5px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.cta-btn.primary{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--deep);border:none;font-weight:700}
+.cta-btn.primary:hover{opacity:0.9;transform:translateY(-1px)}
+.cta-btn.secondary{background:transparent;color:var(--gold-light);border:0.5px solid var(--border-strong)}
+.cta-btn.secondary:hover{background:rgba(201,151,58,0.08);transform:translateY(-1px)}
+.bot-status-ring{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--deep);display:inline-block;transition:background 0.3s}
+.bot-status-ring.online{background:var(--success)}
+.bot-status-ring.offline{background:var(--danger)}
+.bot-status-ring.idle{background:var(--gold)}
+
+/* LIVE TICKER */
+.live-ticker{background:var(--card);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);padding:10px 2rem;display:flex;gap:2.5rem;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.live-ticker::-webkit-scrollbar{display:none}
+.ticker-item{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:flex;gap:8px;flex-shrink:0}
+.ticker-item b{color:var(--gold-light)}
+.ticker-live{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;flex-shrink:0}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.3)}}
+
+/* STATS */
+.stats-section{max-width:1000px;margin:0 auto;padding:3rem 2rem}
+.section-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.15em;color:var(--text-dim);margin-bottom:1.5rem;display:flex;align-items:center;gap:12px}
+.section-title::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:10px;overflow:hidden}
+.stat-card{background:var(--card);padding:1.5rem 1.75rem;transition:background 0.2s}
+.stat-card:hover{background:var(--card2)}
+.stat-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:0.5rem}
+.stat-value{font-family:'Cinzel',serif;font-size:2.2rem;color:var(--gold-light);line-height:1}
+.stat-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:4px}
+.ping-bar-wrap{margin-top:8px;height:4px;background:var(--card2);border-radius:2px;overflow:hidden}
+.ping-bar-fill{height:100%;border-radius:2px;transition:width 0.5s,background 0.3s}
+.uptime-display{display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}
+.uptime-seg{text-align:center}
+.uptime-num{font-family:'Cinzel',serif;font-size:1.8rem;line-height:1;color:var(--gold-light)}
+.uptime-lbl{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim)}
+.uptime-sep{font-family:'Cinzel',serif;font-size:1.8rem;color:var(--border-strong)}
+.spark-cell{background:var(--card);padding:1.25rem 1.75rem;border:0.5px solid var(--border);border-radius:8px;margin-top:1px}
+.spark-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:0.75rem}
+.spark-svg{width:100%;height:48px;display:block}
+
+/* BOT INFO CARD */
+.bot-info-card{max-width:1000px;margin:0 auto;padding:0 2rem}
+.bot-info-inner{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:2rem;display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap}
+.bot-info-avatar{width:80px;height:80px;border-radius:50%;border:2px solid var(--border-strong);object-fit:cover;background:var(--card2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:32px;color:var(--gold-dim);overflow:hidden;position:relative}
+.bot-info-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0}
+.bot-info-body{flex:1;min-width:200px}
+.bot-info-name{font-family:'Cinzel',serif;font-size:22px;color:var(--gold-light);letter-spacing:0.06em;margin-bottom:4px}
+.bot-info-id{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:12px}
+.bot-info-desc{font-size:16px;color:var(--text-muted);line-height:1.7;margin-bottom:12px}
+.bot-info-tags{display:flex;gap:8px;flex-wrap:wrap}
+.bot-info-tag{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(201,151,58,0.07);border:0.5px solid var(--border);color:var(--text-dim)}
+
+/* STAFF */
+.staff-section{max-width:1000px;margin:0 auto;padding:0 2rem 3rem}
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.staff-card{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:1.5rem 1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative;overflow:hidden}
+.staff-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(201,151,58,0.12);border-color:var(--border-strong)}
+.staff-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.staff-pfp{width:72px;height:72px;border-radius:50%;border:2px solid var(--border-strong);margin-bottom:0.75rem;background:var(--card2);font-family:'Cinzel',serif;font-size:28px;color:var(--gold-dim);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0}
+.staff-pfp img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0}
+.staff-name{font-family:'Cinzel',serif;font-size:14px;letter-spacing:0.06em;color:var(--gold-light);margin-bottom:2px}
+.staff-username{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:8px}
+.staff-role{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.1em;padding:4px 10px;border-radius:3px;background:rgba(201,151,58,0.1);border:0.5px solid var(--border-strong);color:var(--gold)}
+.staff-role.admin{background:rgba(201,80,58,0.1);border-color:rgba(201,80,58,0.3);color:var(--danger)}
+.staff-role.owner{background:rgba(201,151,58,0.15);border-color:var(--gold-dim);color:var(--gold-light)}
+.staff-empty{grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);font-style:italic;font-size:15px}
+
+/* SHARED PAGE LAYOUT */
+.page-wrap{max-width:900px;margin:0 auto;padding:3rem 2rem 6rem}
+.page-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:0.5px solid var(--border)}
+.page-badge{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.12em;color:var(--gold);background:rgba(201,151,58,0.1);border:0.5px solid var(--border-strong);padding:5px 12px;border-radius:3px;display:inline-block;margin-bottom:1rem}
+.page-header h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:600;color:var(--gold-light);margin-bottom:0.3rem}
+.page-date{font-size:14px;color:var(--text-dim);font-style:italic}
+.owners{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
+.owner-tag{font-family:'Crimson Pro',serif;font-size:13px;color:var(--gold-dim);background:rgba(201,151,58,0.07);border:0.5px solid var(--border);padding:3px 10px;border-radius:3px;display:flex;align-items:center;gap:6px}
+.owner-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.6}
+.legal-body section{margin-bottom:2.5rem}
+.legal-body h3{font-family:'Cinzel',serif;font-size:14px;font-weight:600;letter-spacing:0.08em;color:var(--gold);margin-bottom:0.75rem;padding-left:1rem;border-left:2px solid var(--gold-dim)}
+.legal-body p{color:var(--text);font-size:17px;line-height:1.8;margin-bottom:0.75rem}
+.legal-body ul{list-style:none;padding:0;margin:0.5rem 0 0.75rem 0}
+.legal-body ul li{color:var(--text);font-size:17px;padding:4px 0 4px 1.2rem;position:relative}
+.legal-body ul li::before{content:'◆';position:absolute;left:0;font-size:7px;color:var(--gold-dim);top:10px}
+.legal-body .not-collected{background:rgba(90,156,98,0.06);border:0.5px solid rgba(90,156,98,0.2);border-radius:6px;padding:0.75rem 1rem;margin:0.5rem 0}
+.discord-link{color:var(--gold-light);text-decoration:none;border-bottom:0.5px solid var(--border-strong);transition:color 0.2s}
+.discord-link:hover{color:var(--gold)}
+
+/* FORMS */
+.form-intro{background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:2rem;font-size:16px;color:var(--text-muted);line-height:1.7}
+.form-intro strong{color:var(--gold-light);font-weight:600}
+.login-prompt{background:rgba(88,101,242,0.1);border:0.5px solid rgba(88,101,242,0.35);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:15px;color:#b0b8ff;display:flex;align-items:center;gap:12px;line-height:1.5}
+.login-prompt a{color:#7289da;cursor:pointer;text-decoration:underline;background:none;border:none;font-size:15px;font-family:'Crimson Pro',serif;padding:0}
+.logged-in-banner{background:rgba(90,156,98,0.08);border:0.5px solid rgba(90,156,98,0.3);border-radius:8px;padding:0.9rem 1.25rem;margin-bottom:1.5rem;font-size:15px;color:var(--success);display:flex;align-items:center;gap:10px}
+.logged-in-banner img{width:24px;height:24px;border-radius:50%}
+.form-section{margin-bottom:2.5rem}
+.form-section h3{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.1em;color:var(--gold);margin-bottom:1.25rem;padding-bottom:0.6rem;border-bottom:0.5px solid var(--border)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.form-field.full{grid-column:1/-1}
+label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim)}
+label .req{color:var(--gold);margin-left:3px}
+input,textarea,select{background:var(--card2);border:0.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;padding:10px 14px;transition:border-color 0.2s,box-shadow 0.25s;outline:none;width:100%;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold-dim);box-shadow:0 0 0 2px rgba(201,151,58,0.12)}
+textarea{resize:vertical;min-height:120px;line-height:1.6}
+select option{background:var(--card2);color:var(--text)}
+.submit-btn{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.12em;color:var(--deep);background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;padding:14px 2.5rem;border-radius:5px;cursor:pointer;transition:opacity 0.2s,transform 0.1s;font-weight:700;position:relative;overflow:hidden}
+.submit-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-100%);transition:transform 0.5s ease}
+.submit-btn:hover{opacity:0.9}.submit-btn:hover::after{transform:translateX(100%)}
+.submit-btn:active{transform:scale(0.98)}
+.submit-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.form-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--border)}
+.form-note{font-size:14px;color:var(--text-dim);font-style:italic;max-width:420px}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.type-card{border:0.5px solid var(--border);border-radius:6px;padding:1rem;cursor:pointer;transition:border-color 0.2s,background 0.2s,transform 0.15s;background:var(--card2);text-align:center}
+.type-card:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.type-card.selected{border-color:var(--gold);background:rgba(201,151,58,0.08);transform:translateY(-1px)}
+.type-card .type-icon{font-size:24px;margin-bottom:6px}
+.type-card .type-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.08em;color:var(--text-muted)}
+.type-card.selected .type-label{color:var(--gold-light)}
+.severity-grid{display:flex;gap:8px;flex-wrap:wrap}
+.sev-btn{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.08em;padding:7px 14px;border:0.5px solid var(--border);border-radius:4px;background:var(--card2);color:var(--text-muted);cursor:pointer;transition:all 0.15s}
+.sev-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.sev-btn.selected-sev{background:rgba(201,151,58,0.1);border-color:var(--gold);color:var(--gold-light)}
+
+/* SUSPENSION TABLE */
+.sus-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
+.sus-search{flex:1;min-width:200px;background:var(--card2);border:0.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Crimson Pro',serif;font-size:15px;padding:9px 14px;outline:none;transition:border-color 0.2s}
+.sus-search:focus{border-color:var(--gold-dim)}
+.sus-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:2rem}
+.sus-stat{background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:1rem 1.25rem;text-align:center;transition:transform 0.2s ease}
+.sus-stat:hover{transform:translateY(-2px)}
+.sus-stat .stat-val{font-family:'Cinzel',serif;font-size:1.8rem;color:var(--gold-light);line-height:1;margin-bottom:4px}
+.sus-stat .stat-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.08em;color:var(--text-dim)}
+.sus-table-wrap{overflow-x:auto;border:0.5px solid var(--border);border-radius:8px}
+.sus-table{width:100%;border-collapse:collapse;font-size:15px}
+.sus-table th{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--gold-dim);padding:12px 16px;text-align:left;border-bottom:0.5px solid var(--border);background:var(--card);white-space:nowrap}
+.sus-table td{padding:11px 16px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:top}
+.sus-table tr:last-child td{border-bottom:none}
+.sus-table tbody tr{transition:background 0.15s ease}
+.sus-table tr:hover td{background:rgba(201,151,58,0.03)}
+.sus-badge{display:inline-block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;padding:3px 9px;border-radius:3px;white-space:nowrap}
+.sus-badge.perm{background:var(--danger-bg);color:var(--danger);border:0.5px solid rgba(201,80,58,0.3)}
+.sus-badge.temp{background:rgba(201,151,58,0.1);color:var(--gold);border:0.5px solid var(--border-strong)}
+.sus-id{font-family:var(--mono);font-size:13px;color:var(--text-dim)}
+.sus-empty{text-align:center;padding:4rem 2rem;color:var(--text-dim);font-style:italic}
+.sus-empty-icon{font-size:2.5rem;margin-bottom:1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ADMIN */
+.api-config{background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:2rem}
+.api-config-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;cursor:pointer;user-select:none}
+.api-config-header h4{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.1em;color:var(--gold-dim);display:flex;align-items:center;gap:8px}
+.api-config-body{display:none}
+.api-config-body.open{display:block}
+.api-save-btn{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;padding:8px 18px;border-radius:5px;border:0.5px solid var(--border-strong);background:transparent;color:var(--gold);cursor:pointer;margin-top:4px;transition:background 0.2s}
+.api-save-btn:hover{background:rgba(201,151,58,0.1)}
+.upload-drop-zone{border:1.5px dashed var(--border-strong);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--card2)}
+.upload-drop-zone:hover,.upload-drop-zone.drag-over{border-color:var(--gold);background:rgba(201,151,58,0.06)}
+.upload-icon{font-size:2rem;margin-bottom:0.5rem}
+.upload-label{font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.08em;color:var(--gold-light);margin-bottom:4px}
+.upload-sub{font-size:13px;color:var(--text-dim);font-style:italic}
+.oauth-setup-note{background:rgba(201,151,58,0.06);border:0.5px solid var(--border);border-radius:6px;padding:1rem 1.25rem;font-size:14px;color:var(--text-dim);margin-top:10px;line-height:1.75}
+.oauth-setup-note strong{color:var(--gold)}
+.oauth-setup-note code{background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;font-size:13px;color:var(--text-muted)}
+
+/* STAFF ADMIN */
+.staff-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:1rem}
+.staff-admin-card{background:var(--card2);border:0.5px solid var(--border);border-radius:8px;padding:1rem 1.25rem;display:flex;gap:12px;align-items:flex-start}
+.staff-admin-pfp{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-strong);background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16px;color:var(--gold-dim);overflow:hidden;position:relative}
+.staff-admin-pfp img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0}
+.staff-admin-body{flex:1;min-width:0}
+.staff-admin-name{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-light);letter-spacing:0.04em;margin-bottom:2px}
+.staff-admin-user{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.staff-admin-pos{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;padding:2px 8px;border-radius:3px;background:rgba(201,151,58,0.1);border:0.5px solid var(--border);color:var(--gold);display:inline-block}
+.remove-staff-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:0;transition:color 0.2s;flex-shrink:0;margin-top:2px}
+.remove-staff-btn:hover{color:var(--danger)}
+.add-staff-form{background:var(--card2);border:0.5px solid var(--border);border-radius:8px;padding:1.25rem;margin-top:1rem}
+.add-staff-form h5{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--gold-dim);margin-bottom:1rem}
+.add-staff-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.add-staff-row input,.add-staff-row select{font-size:14px;padding:8px 12px}
+.add-staff-row label{font-size:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--card2);border:0.5px solid var(--border-strong);border-radius:8px;padding:1rem 1.5rem;font-family:'Crimson Pro',serif;font-size:16px;color:var(--text);max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(100px);opacity:0;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.1em;margin-bottom:4px}
+.toast.success .toast-title{color:var(--success)}
+.toast.error .toast-title{color:var(--danger)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-box{background:var(--card);border:0.5px solid var(--border-strong);border-radius:12px;padding:2rem 2.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:modalPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes modalPop{from{opacity:0;transform:scale(0.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-box h3{font-family:'Cinzel',serif;font-size:15px;letter-spacing:0.1em;color:var(--gold-light);margin-bottom:0.5rem}
+.modal-box p{font-size:14px;color:var(--text-dim);margin-bottom:1.25rem}
+.modal-box input,.modal-box textarea{width:100%;margin-bottom:1rem}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:1rem}
+.modal-btn{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.08em;padding:9px 20px;border-radius:5px;cursor:pointer;border:none}
+.modal-btn.primary{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--deep);font-weight:700}
+.modal-btn.secondary{background:transparent;border:0.5px solid var(--border);color:var(--text-muted)}
+.modal-error{color:var(--danger);font-size:13px;margin-bottom:10px;display:none}
+.site-footer{position:relative;z-index:1;border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-size:14px;color:var(--text-dim);font-style:italic}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--card)}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold-dim)}
+
+@media(max-width:640px){
+  .form-row,.add-staff-row{grid-template-columns:1fr}
+  .nav-links a{padding:0 0.6rem;font-size:10px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .home-hero{padding:2.5rem 1rem 2rem}
+  .live-ticker{gap:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="admin-ids-modal" style="display:none;">
+  <div class="modal-box">
+    <h3>👥 ADMIN DISCORD IDS</h3>
+    <p>Saved to Firestore — applies instantly on every device.</p>
+    <div class="modal-error" id="admin-ids-error"></div>
+    <textarea id="admin-ids-textarea" placeholder="123456789012345678&#10;987654321098765432..." style="min-height:130px;font-family:monospace;font-size:14px;letter-spacing:0.03em;"></textarea>
+    <p style="font-size:12px;color:var(--text-dim);margin-top:-6px;font-style:italic;">One ID per line. Discord → Settings → Advanced → Developer Mode → right-click name → Copy User ID.</p>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAdminIdsModal()">CANCEL</button>
+      <button class="modal-btn primary" onclick="saveAdminIds()">SAVE IDS</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="oauth-setup-modal" style="display:none;">
+  <div class="modal-box" style="max-width:480px;">
+    <h3>⚙️ DISCORD LOGIN SETUP</h3>
+    <div style="background:rgba(201,151,58,0.06);border:0.5px solid var(--border);border-radius:6px;padding:0.75rem 1rem;margin-bottom:1.25rem;font-size:14px;color:var(--text-muted);line-height:1.9;">
+      1. Go to <a href="https://discord.com/developers/applications" target="_blank" style="color:var(--gold-light);">discord.com/developers/applications</a><br>
+      2. Open your bot's application → <strong>OAuth2</strong> tab<br>
+      3. Copy the <strong>Client ID</strong> and paste below<br>
+      4. Add this page's URL as a <strong>Redirect URI</strong>
+    </div>
+    <div class="modal-error" id="setup-modal-error"></div>
+    <label style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);display:block;margin-bottom:6px;">CLIENT ID <span style="color:var(--gold);">*</span></label>
+    <input type="text" id="setup-client-id" placeholder="123456789012345678" onkeydown="if(event.key==='Enter')saveOAuthSetupAndLogin()">
+    <label style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);display:block;margin-bottom:6px;">REDIRECT URI</label>
+    <input type="url" id="setup-redirect-uri" placeholder="https://yoursite.com/goldi-bot.html" onkeydown="if(event.key==='Enter')saveOAuthSetupAndLogin()">
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeOAuthSetupModal()">CANCEL</button>
+      <button class="modal-btn primary" onclick="saveOAuthSetupAndLogin()">SAVE &amp; LOGIN ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#" onclick="navTo('home');return false;">
+    <div class="coin">G</div>GOLDI
+  </a>
+  <div class="nav-links">
+    <a class="sep active" id="nav-home" href="#" onclick="navTo('home');return false;">HOME</a>
+    <a class="sep" id="nav-privacy" href="#" onclick="navTo('privacy');return false;">PRIVACY</a>
+    <a class="sep" id="nav-tos" href="#" onclick="navTo('tos');return false;">TERMS</a>
+    <a class="sep" id="nav-appeal" href="#" onclick="navTo('appeal');return false;">APPEAL</a>
+    <a class="sep" id="nav-report" href="#" onclick="navTo('report');return false;">REPORT</a>
+    <a class="sep" id="nav-suspended" href="#" onclick="navTo('suspended');return false;">🔨 SUSPENDED</a>
+    <a href="https://discord.gg/F7JJG8cw8w" target="_blank">DISCORD ↗</a>
+  </div>
+  <div id="nav-auth" style="display:flex;">
+    <button class="discord-login-btn" onclick="startDiscordLogin()">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M13.545 1.033A13.194 13.194 0 0010.27 0c-.14.255-.304.6-.417.872a12.233 12.233 0 00-3.706 0A9.193 9.193 0 005.73 0 13.181 13.181 0 002.45 1.037C.352 4.125-.216 7.135.068 10.1a13.292 13.292 0 004.072 2.067c.329-.45.621-.927.873-1.43a8.679 8.679 0 01-1.375-.666c.115-.085.228-.172.337-.261 2.651 1.228 5.525 1.228 8.144 0 .11.09.223.176.337.261-.438.261-.9.488-1.378.668.252.504.544.98.874 1.428a13.267 13.267 0 004.074-2.065c.334-3.506-.568-6.487-2.48-9.069zM5.35 8.27c-.8 0-1.458-.743-1.458-1.651 0-.908.64-1.653 1.458-1.653.817 0 1.47.745 1.457 1.653 0 .908-.64 1.651-1.457 1.651zm5.3 0c-.8 0-1.457-.743-1.457-1.651 0-.908.64-1.653 1.457-1.653.818 0 1.47.745 1.457 1.653 0 .908-.637 1.651-1.457 1.651z" fill="white"/></svg>
+      LOGIN
+    </button>
+  </div>
+  <div id="nav-user" style="display:none;" class="nav-user">
+    <img id="nav-avatar" src="" alt="avatar">
+    <span class="nav-username" id="nav-username-display"></span>
+    <button class="nav-logout" onclick="logoutDiscord()">✕</button>
+  </div>
+</nav>
+
+<div id="app">
+
+<!-- ══════════ HOME PAGE ══════════ -->
+<div class="page active" id="page-home">
+
+  <div class="home-hero">
+    <div class="hero-avatar-wrap" id="home-avatar">G
+      <img id="home-avatar-img" src="" alt="" style="display:none;">
+    </div>
+    <h1 id="home-bot-name">GOLDI BOT</h1>
+    <div class="bot-tag" id="home-bot-tag">Loading from Discord…</div>
+    <p class="hero-desc" id="home-bot-desc">A feature-rich Discord bot — gacha, poker, trading, moderation and more.</p>
+    <div class="hero-badges">
+      <span class="hero-badge gold">⚔ GACHA</span>
+      <span class="hero-badge gold">🃏 POKER</span>
+      <span class="hero-badge gold">🔄 TRADING</span>
+      <span class="hero-badge blue">🛡 MODERATION</span>
+      <span class="hero-badge status" id="home-status-badge">
+        <span class="bot-status-ring offline" id="home-status-ring"></span>
+        <span id="home-status-text">CONNECTING…</span>
+      </span>
+    </div>
+    <div class="hero-ctas">
+      <a class="cta-btn primary" href="https://discord.com/oauth2/authorize" id="invite-link" target="_blank">＋ INVITE BOT</a>
+      <a class="cta-btn secondary" href="https://discord.gg/F7JJG8cw8w" target="_blank">JOIN SERVER ↗</a>
+      <button class="cta-btn secondary" onclick="navTo('appeal')">SUBMIT APPEAL →</button>
+    </div>
+  </div>
+
+  <div class="live-ticker">
+    <div class="ticker-live"><div class="live-dot"></div>LIVE</div>
+    <div class="ticker-item">SERVERS <b id="tk-guilds">—</b></div>
+    <div class="ticker-item">USERS <b id="tk-users">—</b></div>
+    <div class="ticker-item">PING <b id="tk-ping">—</b>ms</div>
+    <div class="ticker-item">UPTIME <b id="tk-uptime">—</b></div>
+    <div class="ticker-item">COMMANDS <b id="tk-cmds">—</b></div>
+    <div class="ticker-item">UPDATED <b id="tk-updated">—</b></div>
+  </div>
+
+  <div class="bot-info-card" style="margin-top:2.5rem;">
+    <div class="bot-info-inner">
+      <div class="bot-info-avatar" id="bi-avatar">G<img id="bi-avatar-img" src="" alt="" style="display:none;"></div>
+      <div class="bot-info-body">
+        <div class="bot-info-name" id="bi-name">GOLDI</div>
+        <div class="bot-info-id" id="bi-id">ID: loading…</div>
+        <div class="bot-info-desc" id="bi-desc">Bot information loaded live from the Discord Developer Portal via your Supabase stats endpoint. Configure Supabase credentials in the Admin Panel.</div>
+        <div class="bot-info-tags" id="bi-tags">
+          <span class="bot-info-tag">discord.py 2.4+</span>
+          <span class="bot-info-tag">Python</span>
+          <span class="bot-info-tag">SQLite</span>
+          <span class="bot-info-tag">Supabase</span>
+          <span class="bot-info-tag">Firestore</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="section-title">BOT STATISTICS</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Servers</div>
+        <div class="stat-value" id="stat-guilds">—</div>
+        <div class="stat-sub">guilds joined</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Users</div>
+        <div class="stat-value" id="stat-users">—</div>
+        <div class="stat-sub">total members</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Commands Run</div>
+        <div class="stat-value" id="stat-cmds">—</div>
+        <div class="stat-sub">this session</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ping</div>
+        <div class="stat-value" style="font-size:1.8rem;display:flex;align-items:baseline;gap:4px;">
+          <span id="stat-ping">—</span><span style="font-family:var(--mono);font-size:14px;color:var(--text-dim);">ms</span>
+        </div>
+        <div class="ping-bar-wrap"><div class="ping-bar-fill" id="ping-fill" style="width:0%;background:var(--success);"></div></div>
+        <div class="stat-sub" id="ping-label">—</div>
+      </div>
+      <div class="stat-card" style="grid-column:span 2;">
+        <div class="stat-label">Uptime</div>
+        <div class="uptime-display">
+          <div class="uptime-seg"><div class="uptime-num" id="up-d">00</div><div class="uptime-lbl">days</div></div>
+          <div class="uptime-sep">:</div>
+          <div class="uptime-seg"><div class="uptime-num" id="up-h">00</div><div class="uptime-lbl">hrs</div></div>
+          <div class="uptime-sep">:</div>
+          <div class="uptime-seg"><div class="uptime-num" id="up-m">00</div><div class="uptime-lbl">min</div></div>
+          <div class="uptime-sep">:</div>
+          <div class="uptime-seg"><div class="uptime-num" id="up-s">00</div><div class="uptime-lbl">sec</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="spark-cell" style="margin-top:1px;">
+      <div class="spark-label">Latency history — last 20 readings</div>
+      <svg class="spark-svg" id="spark" viewBox="0 0 600 48" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <div class="staff-section">
+    <div class="section-title" style="padding:0 0 0;margin-bottom:1.5rem;">BOT STAFF TEAM</div>
+    <div class="staff-grid" id="staff-grid">
+      <div class="staff-empty">Loading team…</div>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+<!-- ══════════ PRIVACY PAGE ══════════ -->
+<div class="page" id="page-privacy">
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="page-badge">PRIVACY POLICY</div>
+      <h1>Data &amp; Privacy</h1>
+      <div class="page-date">Effective Date: 12 February 2025</div>
+      <div class="owners">
+        <span class="owner-tag">best1111</span>
+        <span class="owner-tag">eren_founder</span>
+        <span class="owner-tag">reynddd</span>
+      </div>
+    </div>
+    <div class="legal-body">
+      <p>This privacy policy explains what data Goldi collects and how it is used.</p>
+      <section><h3>1. Data We Collect</h3>
+        <p>The Bot may collect and store:</p>
+        <ul>
+          <li>User IDs and Server IDs (to track preferences or settings)</li>
+          <li>Messages or commands sent to the Bot (for functionality)</li>
+          <li>Tournament data or game statistics (if applicable)</li>
+        </ul>
+        <p>We do <strong>not</strong> collect:</p>
+        <ul class="not-collected">
+          <li>Direct messages between users</li>
+          <li>Any sensitive personal information</li>
+        </ul>
+      </section>
+      <section><h3>2. How We Use Data</h3>
+        <p>Data is used solely to provide features of the Bot. It is not sold, shared, or transferred to third parties.</p>
+      </section>
+      <section><h3>3. Data Storage and Security</h3>
+        <p>We take reasonable measures to secure data but cannot guarantee absolute security. Data is kept only as long as necessary.</p>
+      </section>
+      <section><h3>4. User Rights</h3>
+        <p>You may request deletion of your data by contacting us via <a class="discord-link" href="https://discord.gg/F7JJG8cw8w" target="_blank">discord.gg/F7JJG8cw8w</a></p>
+      </section>
+      <section><h3>5. Changes to the Policy</h3>
+        <p>This privacy policy may be updated at any time. Continued use implies acceptance.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOS PAGE ══════════ -->
+<div class="page" id="page-tos">
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="page-badge">TERMS OF SERVICE</div>
+      <h1>Terms of Service</h1>
+      <div class="page-date">Effective Date: 12 February 2025</div>
+      <div class="owners">
+        <span class="owner-tag">best1111</span>
+        <span class="owner-tag">eren_founder</span>
+        <span class="owner-tag">reynddd</span>
+      </div>
+    </div>
+    <div class="legal-body">
+      <p>By using Goldi on Discord, you agree to the following terms:</p>
+      <section><h3>1. Usage</h3>
+        <p>You must follow the Discord Terms of Service and Community Guidelines. Misuse — including spam, harassment, or exploiting bugs — may result in a permanent ban.</p>
+      </section>
+      <section><h3>2. Availability</h3>
+        <p>The Bot is provided "as-is" without guarantees of uptime, support, or continued availability. The owners reserve the right to add, remove, or modify features at any time without prior notice.</p>
+      </section>
+      <section><h3>3. Termination</h3>
+        <p>We reserve the right to block or remove access for any user or server at our discretion, with or without notice.</p>
+      </section>
+      <section><h3>4. Limitation of Liability</h3>
+        <p>Unless a direct result of a bug in the Bot, we are not responsible for any damages, data loss, or issues caused by using the Bot.</p>
+      </section>
+      <section><h3>5. Changes to the Terms</h3>
+        <p>These terms may change at any time. Continued use implies acceptance.</p>
+      </section>
+      <section><h3>6. Fair Use Policy</h3>
+        <p>By using the Bot, you agree not to cheat — including creating alternative accounts to battle between them, or using automated tools to farm currencies or gain an unfair advantage. By inviting the Bot, you have consented to allow a member of the Bot Administration to enter the server unannounced. Any data collected by an Administrator will be strictly confidential.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APPEAL PAGE ══════════ -->
+<div class="page" id="page-appeal">
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="page-badge">APPEALS</div>
+      <h1>Appeal a Suspension</h1>
+      <div class="page-date">Reviewed by Goldi admins within 72 hours</div>
+    </div>
+    <div class="login-prompt" id="appeal-login-prompt" style="display:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#7289da"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      <span>Log in with Discord to auto-fill your username and User ID. &nbsp;<a onclick="startDiscordLogin()">Login now →</a></span>
+    </div>
+    <div class="logged-in-banner" id="appeal-logged-in-banner" style="display:none;">
+      <img id="appeal-avatar" src="" alt=""><span id="appeal-logged-in-text"></span>
+    </div>
+    <div class="form-intro">Fill in the form to appeal a suspension or ban. Your appeal will be <strong>posted directly to the Goldi admin channel</strong> on Discord for review. Be honest and detailed — incomplete appeals may be automatically declined.</div>
+    <input type="hidden" id="appeal-webhook">
+    <div class="form-section">
+      <h3>YOUR IDENTITY</h3>
+      <div class="form-row">
+        <div class="form-field"><label>Discord Username <span class="req">*</span></label><input type="text" id="a-username" placeholder="username or @username"></div>
+        <div class="form-field"><label>Discord User ID <span class="req">*</span></label><input type="text" id="a-userid" placeholder="e.g. 802809697421623318"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h3>SUSPENSION DETAILS</h3>
+      <div class="form-row">
+        <div class="form-field"><label>Server Name / ID</label><input type="text" id="a-server" placeholder="Server where suspended"></div>
+        <div class="form-field"><label>Approximate Date <span class="req">*</span></label><input type="date" id="a-date"></div>
+      </div>
+      <div class="form-field full" style="margin-top:1rem;"><label>Reason Given (if any)</label><input type="text" id="a-givenreason" placeholder="What reason were you given?"></div>
+    </div>
+    <div class="form-section">
+      <h3>YOUR APPEAL</h3>
+      <div class="form-field" style="margin-bottom:1rem;"><label>Why should the suspension be lifted? <span class="req">*</span></label><textarea id="a-reason" placeholder="Explain your case clearly and honestly." rows="5"></textarea></div>
+      <div class="form-field"><label>Additional evidence or context</label><textarea id="a-evidence" placeholder="Screenshot descriptions, timestamps, witnesses, etc." rows="3"></textarea></div>
+    </div>
+    <div class="form-footer">
+      <p class="form-note">By submitting you confirm the information is accurate. False appeals will result in a permanent ban.</p>
+      <button class="submit-btn" onclick="submitAppeal()">SUBMIT APPEAL ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ REPORT PAGE ══════════ -->
+<div class="page" id="page-report">
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="page-badge">REPORT</div>
+      <h1>Report a User</h1>
+      <div class="page-date">Reports reviewed by the moderation team</div>
+    </div>
+    <div class="login-prompt" id="report-login-prompt" style="display:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#7289da"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      <span>Log in with Discord to auto-fill your reporter identity. &nbsp;<a onclick="startDiscordLogin()">Login now →</a></span>
+    </div>
+    <div class="logged-in-banner" id="report-logged-in-banner" style="display:none;">
+      <img id="report-avatar" src="" alt=""><span id="report-logged-in-text"></span>
+    </div>
+    <div class="form-intro">Use this form to report a user for violating Goldi's <strong>Terms of Service</strong> or <strong>Fair Use Policy</strong>. Reports go directly to the admin channel. Abuse of this system may result in action against your account.</div>
+    <input type="hidden" id="report-webhook">
+    <div class="form-section">
+      <h3>YOUR IDENTITY</h3>
+      <div class="form-row">
+        <div class="form-field"><label>Your Discord Username <span class="req">*</span></label><input type="text" id="r-reporter" placeholder="Your username"></div>
+        <div class="form-field"><label>Your User ID</label><input type="text" id="r-reporterid" placeholder="Optional"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h3>REPORTED USER</h3>
+      <div class="form-row">
+        <div class="form-field"><label>Username <span class="req">*</span></label><input type="text" id="r-target" placeholder="Reported user's username"></div>
+        <div class="form-field"><label>User ID <span class="req">*</span></label><input type="text" id="r-targetid" placeholder="Their Discord User ID"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h3>VIOLATION TYPE</h3>
+      <div class="type-grid">
+        <div class="type-card" onclick="selectType(this,'cheating')"><div class="type-icon">🎲</div><div class="type-label">CHEATING / ALT ACCOUNTS</div></div>
+        <div class="type-card" onclick="selectType(this,'automation')"><div class="type-icon">🤖</div><div class="type-label">AUTOMATION / BOTS</div></div>
+        <div class="type-card" onclick="selectType(this,'harassment')"><div class="type-icon">🚫</div><div class="type-label">HARASSMENT / SPAM</div></div>
+        <div class="type-card" onclick="selectType(this,'bug_abuse')"><div class="type-icon">🐛</div><div class="type-label">BUG EXPLOITATION</div></div>
+      </div>
+      <input type="hidden" id="r-type" value="">
+      <div class="form-field" style="margin-top:0.75rem;">
+        <label>Suggested Action</label>
+        <div class="severity-grid">
+          <button class="sev-btn" onclick="selectSev(this,'warn')">Warn</button>
+          <button class="sev-btn" onclick="selectSev(this,'temp_ban')">Temp Ban</button>
+          <button class="sev-btn" onclick="selectSev(this,'perm_ban')">Perm Ban</button>
+          <button class="sev-btn selected-sev" onclick="selectSev(this,'investigate')">Investigate First</button>
+        </div>
+        <input type="hidden" id="r-severity" value="investigate">
+      </div>
+    </div>
+    <div class="form-section">
+      <h3>DESCRIPTION</h3>
+      <div class="form-field" style="margin-bottom:1rem;"><label>Describe the violation <span class="req">*</span></label><textarea id="r-desc" placeholder="What happened? Be specific — include dates, amounts, actions." rows="5"></textarea></div>
+      <div class="form-field"><label>Evidence</label><textarea id="r-evidence" placeholder="Screenshot descriptions, message IDs, server names, timestamps…" rows="3"></textarea></div>
+    </div>
+    <div class="form-footer">
+      <p class="form-note">False reports are a violation of the Terms of Service.</p>
+      <button class="submit-btn" onclick="submitReport()">SUBMIT REPORT ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SUSPENDED PAGE ══════════ -->
+<div class="page" id="page-suspended">
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="page-badge">DATABASE</div>
+      <h1>Suspended Users</h1>
+      <div class="page-date" id="sus-last-updated">Loading…</div>
+    </div>
+
+    <div id="admin-locked-banner" style="display:none;">
+      <div id="admin-banner-unlock" class="login-prompt" style="cursor:pointer;display:none;" onclick="showAdminLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7289da" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <span>Admin access is Discord ID–based. Log in with Discord to unlock. &nbsp;<a>Unlock admin →</a></span>
+      </div>
+      <div id="admin-banner-claim" class="login-prompt" style="cursor:pointer;display:none;border-color:rgba(201,151,58,0.35);color:var(--gold-pale);" onclick="claimFirstAdmin()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9973A" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span>No admins configured yet. <a style="color:var(--gold-light);">Click to claim first admin →</a></span>
+      </div>
+      <div id="admin-banner-nologin" class="login-prompt" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7289da" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <span>No admins configured. <a onclick="startDiscordLogin()" style="cursor:pointer;">Log in with Discord first →</a></span>
+      </div>
+    </div>
+
+    <div id="admin-panel" style="display:none;">
+      <div class="api-config" style="border-color:rgba(201,151,58,0.4);">
+        <div class="api-config-header" onclick="toggleAdminPanel()">
+          <h4>🔐 ADMIN PANEL <span style="color:var(--success);font-size:11px;">● UNLOCKED</span></h4>
+          <span id="admin-toggle-icon">▼</span>
+        </div>
+        <div class="api-config-body open" id="admin-panel-body">
+
+          <div style="margin-bottom:1.5rem;">
+            <label style="display:block;margin-bottom:6px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);">UPLOAD SUSPENDED USERS (JSON)</label>
+            <div class="upload-drop-zone" id="upload-zone" onclick="document.getElementById('json-file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+              <div class="upload-icon">📂</div>
+              <div class="upload-label">Click to upload or drag &amp; drop</div>
+              <div class="upload-sub">JSON exported via <code style="font-family:monospace;background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:3px;">!exportsus</code> bot command</div>
+            </div>
+            <input type="file" id="json-file-input" accept=".json" style="display:none;" onchange="handleFileUpload(event)">
+            <div class="oauth-setup-note" style="margin-top:8px;">
+              <strong>Expected format:</strong> <code>{"suspensions":[{"user_id":123,"reason":"…","issued_by":456,"issued_at":1234567890.0,"expires_at":null}]}</code>
+            </div>
+          </div>
+
+          <div style="border-top:0.5px solid var(--border);padding-top:1.5rem;margin-bottom:1.5rem;">
+            <label style="display:block;margin-bottom:6px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);">STAFF TEAM MANAGEMENT</label>
+            <div class="staff-admin-grid" id="staff-admin-list"></div>
+            <div class="add-staff-form">
+              <h5>➕ ADD STAFF MEMBER</h5>
+              <div class="add-staff-row">
+                <div class="form-field"><label>Display Name</label><input type="text" id="s-name" placeholder="e.g. Ashif"></div>
+                <div class="form-field"><label>Username / Discord Tag</label><input type="text" id="s-username" placeholder="e.g. best1111"></div>
+              </div>
+              <div class="add-staff-row">
+                <div class="form-field"><label>Position / Role</label><input type="text" id="s-position" placeholder="e.g. Developer, Admin, Moderator"></div>
+                <div class="form-field"><label>Profile Photo URL</label><input type="url" id="s-pfp" placeholder="https://cdn.discordapp.com/…"></div>
+              </div>
+              <button class="api-save-btn" onclick="addStaffMember()" style="margin-top:4px;">➕ ADD MEMBER</button>
+            </div>
+          </div>
+
+          <div style="border-top:0.5px solid var(--border);padding-top:1.25rem;">
+            <label style="display:block;margin-bottom:10px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);">WEBHOOKS &amp; CONFIG</label>
+            <div style="display:grid;gap:10px;margin-bottom:12px;">
+              <div><label style="display:block;margin-bottom:5px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;color:var(--text-dim);">APPEAL WEBHOOK URL</label>
+              <input type="url" id="appeal-webhook-admin" placeholder="https://discord.com/api/webhooks/…"></div>
+              <div><label style="display:block;margin-bottom:5px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;color:var(--text-dim);">REPORT WEBHOOK URL</label>
+              <input type="url" id="report-webhook-admin" placeholder="https://discord.com/api/webhooks/…"></div>
+              <div><label style="display:block;margin-bottom:5px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;color:var(--text-dim);">DISCORD CLIENT ID (OAuth)</label>
+              <input type="text" id="discord-client-id" placeholder="Your Discord Application Client ID"></div>
+              <div><label style="display:block;margin-bottom:5px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;color:var(--text-dim);">SUPABASE URL</label>
+              <input type="url" id="admin-supabase-url" placeholder="https://xxxx.supabase.co"></div>
+              <div><label style="display:block;margin-bottom:5px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.08em;color:var(--text-dim);">SUPABASE ANON KEY</label>
+              <input type="text" id="admin-supabase-key" placeholder="sb_publishable_…"></div>
+            </div>
+            <button class="api-save-btn" onclick="saveAdminConfig()">💾 SAVE ALL CONFIG</button>
+            <button class="api-save-btn" onclick="lockAdmin()" style="margin-left:8px;color:var(--danger);border-color:rgba(201,80,58,0.4);">🔒 LOCK PANEL</button>
+            <button class="api-save-btn" onclick="openAdminIdsModal()" style="margin-left:8px;color:var(--text-muted);">👥 MANAGE ADMIN IDS</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="user-view">
+      <div id="sus-login-prompt" class="login-prompt" style="display:none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#7289da"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+        <span>Log in with Discord to check if your account is suspended. &nbsp;<a onclick="startDiscordLogin()" style="cursor:pointer;">Login now →</a></span>
+      </div>
+      <div id="sus-user-result">
+        <div class="sus-empty"><div class="sus-empty-icon">⌛</div><p>Loading suspension database…</p></div>
+      </div>
+    </div>
+
+    <div id="admin-view" style="display:none;">
+      <div class="sus-stats" id="sus-stats">
+        <div class="sus-stat"><div class="stat-val" id="stat-total">0</div><div class="stat-label">TOTAL SUSPENDED</div></div>
+        <div class="sus-stat"><div class="stat-val" id="stat-perm">0</div><div class="stat-label">PERMANENT BANS</div></div>
+        <div class="sus-stat"><div class="stat-val" id="stat-temp">0</div><div class="stat-label">TEMP BANS</div></div>
+        <div class="sus-stat"><div class="stat-val" id="stat-warn">0</div><div class="stat-label">WARNINGS</div></div>
+      </div>
+      <div class="sus-toolbar">
+        <input type="text" class="sus-search" id="sus-search" placeholder="Search by user ID or reason…" oninput="filterSuspended()">
+      </div>
+      <div id="sus-content">
+        <div class="sus-empty"><div class="sus-empty-icon">🔨</div><p>No suspension data loaded yet.<br><span style="font-size:14px;color:var(--text-dim);">Upload the JSON file using the admin panel above.</span></p></div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /page-suspended -->
+
+</div><!-- /app -->
+
+<footer class="site-footer">
+  Goldi Bot — All rights reserved — <a class="discord-link" href="https://discord.gg/F7JJG8cw8w" target="_blank">discord.gg/F7JJG8cw8w</a>
+</footer>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div id="toast-msg"></div>
+</div>
+<script>
+// ═══ CONFIG ═══
+const FIRESTORE_PROJECT='goldi-e3fcb';
+const HARDCODED_ADMIN_IDS=[];
+const DISCORD_USER_KEY='goldi_discord_user';
+const ADMIN_SESSION_KEY='goldi_admin_session';
+const PAGES=['home','privacy','tos','appeal','report','suspended'];
+const FS_BASE=`https://firestore.googleapis.com/v1/projects/${FIRESTORE_PROJECT}/databases/(default)/documents`;
+
+let fsConfig={adminIds:[],appealWebhook:'',reportWebhook:'',discordClientId:'',redirectUri:'',supabaseUrl:'',supabaseKey:''};
+let allSuspended=[],allStaff=[],fbLastUpdated='';
+let uptimeBase=null,uptimeTimer=null;
+const pingHistory=[];
+
+// ═══ FIRESTORE HELPERS ═══
+function fsVal(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};if(typeof v==='string')return{stringValue:v};if(Array.isArray(v))return{arrayValue:{values:v.map(fsVal)}};if(typeof v==='object')return{mapValue:{fields:Object.fromEntries(Object.entries(v).map(([k,u])=>[k,fsVal(u)]))}};return{stringValue:String(v)};}
+function fsUnval(f){if(!f)return null;if('nullValue'in f)return null;if('booleanValue'in f)return f.booleanValue;if('integerValue'in f)return Number(f.integerValue);if('doubleValue'in f)return f.doubleValue;if('stringValue'in f)return f.stringValue;if('arrayValue'in f)return(f.arrayValue.values||[]).map(fsUnval);if('mapValue'in f)return Object.fromEntries(Object.entries(f.mapValue.fields||{}).map(([k,u])=>[k,fsUnval(u)]));return null;}
+function fsDocToObj(doc){if(!doc||!doc.fields)return null;return Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,fsUnval(v)]));}
+async function fsRead(c,d){try{const r=await fetch(`${FS_BASE}/${c}/${d}`);if(r.status===404)return null;if(!r.ok)throw new Error('FS read '+r.status);return fsDocToObj(await r.json());}catch{return null;}}
+async function fsPatch(c,d,data){const fields=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,fsVal(v)]));const mask=Object.keys(data).map(k=>`updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');const r=await fetch(`${FS_BASE}/${c}/${d}?${mask}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});if(!r.ok)throw new Error('FS write '+r.status);return r.json();}
+async function fsWrite(c,d,data){const fields=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,fsVal(v)]));const r=await fetch(`${FS_BASE}/${c}/${d}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});if(!r.ok)throw new Error('FS write '+r.status);return r.json();}
+
+// ═══ NAV ═══
+function navTo(name){
+  PAGES.forEach(p=>{
+    const pg=document.getElementById('page-'+p);
+    const lk=document.getElementById('nav-'+p);
+    if(pg)pg.classList.toggle('active',p===name);
+    if(lk)lk.classList.toggle('active',p===name);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='suspended')initSuspendedTab();
+  history.replaceState(null,'','#'+name);
+}
+
+// ═══ TOAST ═══
+function showToast(type,title,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-title').textContent=title;
+  document.getElementById('toast-msg').textContent=msg;
+  t.className='toast '+type;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4500);
+}
+
+// ═══ BOT STATS (Supabase) ═══
+async function fetchBotStats(){
+  if(!fsConfig.supabaseUrl||!fsConfig.supabaseKey)return;
+  try{
+    const res=await fetch(`${fsConfig.supabaseUrl}/rest/v1/bot_stats?id=eq.1&select=data,updated_at`,{headers:{'apikey':fsConfig.supabaseKey,'Authorization':'Bearer '+fsConfig.supabaseKey},signal:AbortSignal.timeout(8000)});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const rows=await res.json();
+    if(!rows.length||!rows[0].data)return;
+    const d=rows[0].data;
+    const age=(Date.now()-new Date(rows[0].updated_at))/1000;
+    if(age>120)d.status='offline';
+    applyBotStats(d,rows[0].updated_at);
+  }catch(e){console.warn('Stats:',e.message);setHomeStatus('offline');}
+}
+
+function applyBotStats(d,updatedAt){
+  if(d.bot_name){
+    const n=d.bot_name;
+    document.getElementById('home-bot-name').textContent=n.toUpperCase();
+    document.getElementById('bi-name').textContent=n;
+    document.getElementById('bi-id').textContent='ID: '+(d.bot_id||'—');
+    const tag=n+(d.discriminator?'#'+d.discriminator:'');
+    document.getElementById('home-bot-tag').textContent=tag+(d.bot_id?' · ID: '+d.bot_id:'');
+    if(d.bot_id)document.getElementById('invite-link').href=`https://discord.com/oauth2/authorize?client_id=${d.bot_id}&permissions=8&scope=bot+applications.commands`;
+    if(d.bot_avatar){showBotAvatar('home-avatar-img','home-avatar',d.bot_avatar,n);showBotAvatar('bi-avatar-img','bi-avatar',d.bot_avatar,n);}
+  }
+  if(d.description)document.getElementById('bi-desc').textContent=d.description;
+  setHomeStatus(d.status||'offline');
+  const guilds=d.guilds??d.guild_count??null;
+  const users=d.total_users??d.user_count??null;
+  const cmds=d.commands_run??d.command_count??null;
+  if(guilds!==null){setEl('stat-guilds',fmtNum(guilds));setEl('tk-guilds',fmtNum(guilds));}
+  if(users!==null){setEl('stat-users',fmtNum(users));setEl('tk-users',fmtNum(users));}
+  if(cmds!==null){setEl('stat-cmds',fmtNum(cmds));setEl('tk-cmds',fmtNum(cmds));}
+  const ping=d.latency_ms??d.ping??d.latency??null;
+  if(ping!==null){
+    const ms=Math.round(ping);
+    setEl('stat-ping',ms);setEl('tk-ping',ms);
+    document.getElementById('ping-label').textContent=pingLabel(ms);
+    const fill=document.getElementById('ping-fill');
+    fill.style.width=Math.min(100,Math.round(ms/4))+'%';
+    fill.style.background=pingColor(ms);
+    pingHistory.push(ms);if(pingHistory.length>20)pingHistory.shift();
+    drawSparkline(pingHistory);
+  }
+  const upSecs=d.uptime_seconds??d.uptime??null;
+  if(upSecs!==null)setUptime(upSecs);
+  if(updatedAt)setEl('tk-updated',new Date(updatedAt).toLocaleTimeString());
+}
+
+function showBotAvatar(imgId,wrapId,src,name){
+  const img=document.getElementById(imgId);const wrap=document.getElementById(wrapId);
+  if(img&&wrap){img.src=src;img.style.display='block';if(wrap.childNodes[0]&&wrap.childNodes[0].nodeType===3)wrap.childNodes[0].textContent='';}
+}
+function setHomeStatus(s){
+  const ring=document.getElementById('home-status-ring');const txt=document.getElementById('home-status-text');
+  if(ring){ring.className='bot-status-ring '+s;}if(txt)txt.textContent=s.toUpperCase();
+}
+function setEl(id,val){const el=document.getElementById(id);if(el&&el.textContent!==String(val))el.textContent=val;}
+function fmtNum(v){return typeof v==='number'?v.toLocaleString():v;}
+function pingLabel(ms){return ms<80?'Excellent':ms<150?'Good':ms<300?'Fair':'Poor';}
+function pingColor(ms){return ms<80?'var(--success)':ms<150?'var(--gold)':'var(--danger)';}
+function pad(n){return String(n).padStart(2,'0');}
+
+function setUptime(seconds){
+  uptimeBase=Date.now()/1000-seconds;
+  if(uptimeTimer)clearInterval(uptimeTimer);
+  uptimeTimer=setInterval(tickUptime,1000);tickUptime();
+}
+function tickUptime(){
+  const s=Math.floor(Date.now()/1000-uptimeBase);
+  const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  setEl('up-d',pad(d));setEl('up-h',pad(h));setEl('up-m',pad(m));setEl('up-s',pad(sec));
+  setEl('tk-uptime',d>0?`${d}d ${h}h ${m}m`:`${h}h ${m}m ${pad(sec)}s`);
+}
+
+function drawSparkline(data){
+  const svg=document.getElementById('spark');if(!data.length||!svg)return;
+  const W=600,H=48,p=4,max=Math.max(...data,1),min=Math.min(...data);
+  const xStep=(W-p*2)/Math.max(data.length-1,1);
+  const pts=data.map((v,i)=>`${(p+i*xStep).toFixed(1)},${(H-p-((v-min)/(max-min+1))*(H-p*2)).toFixed(1)}`);
+  const fill=`${pts[0].split(',')[0]},${H} `+pts.join(' ')+` ${pts[pts.length-1].split(',')[0]},${H}`;
+  svg.innerHTML=`<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold)" stop-opacity=".2"/><stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/></linearGradient></defs><polygon points="${fill}" fill="url(#sg)"/><polyline points="${pts.join(' ')}" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${pts[pts.length-1].split(',')[0]}" cy="${pts[pts.length-1].split(',')[1]}" r="3" fill="var(--gold)"/>`;
+}
+
+// ═══ STAFF ═══
+function getRoleClass(pos){if(!pos)return'';const p=pos.toLowerCase();if(p.includes('owner')||p.includes('founder'))return'owner';if(p.includes('admin')||p.includes('dev'))return'admin';return'';}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function renderStaffGrid(list){
+  const grid=document.getElementById('staff-grid');if(!grid)return;
+  if(!list||!list.length){grid.innerHTML='<div class="staff-empty">No staff members configured yet. Admins can add them via the Suspended page → Admin Panel.</div>';return;}
+  grid.innerHTML=list.map(m=>`
+    <div class="staff-card">
+      <div class="staff-pfp">${m.pfp?`<img src="${escHtml(m.pfp)}" alt="" onerror="this.style.display='none'">`:''}${!m.pfp?escHtml((m.name||'?')[0].toUpperCase()):''}</div>
+      <div class="staff-name">${escHtml(m.name||'Unknown')}</div>
+      <div class="staff-username">@${escHtml(m.username||'—')}</div>
+      <span class="staff-role ${getRoleClass(m.position)}">${escHtml(m.position||'Staff')}</span>
+    </div>`).join('');
+}
+
+function renderStaffAdmin(list){
+  const el=document.getElementById('staff-admin-list');if(!el)return;
+  if(!list||!list.length){el.innerHTML='<div style="color:var(--text-dim);font-style:italic;font-size:14px;padding:8px 0;">No staff members yet. Add one below.</div>';return;}
+  el.innerHTML=list.map((m,i)=>`
+    <div class="staff-admin-card">
+      <div class="staff-admin-pfp">${m.pfp?`<img src="${escHtml(m.pfp)}" alt="" onerror="this.style.display='none'">`:(m.name||'?')[0].toUpperCase()}</div>
+      <div class="staff-admin-body">
+        <div class="staff-admin-name">${escHtml(m.name||'Unknown')}</div>
+        <div class="staff-admin-user">@${escHtml(m.username||'—')}</div>
+        <span class="staff-admin-pos">${escHtml(m.position||'Staff')}</span>
+      </div>
+      <button class="remove-staff-btn" onclick="removeStaffMember(${i})" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+async function addStaffMember(){
+  const name=document.getElementById('s-name').value.trim();
+  const username=document.getElementById('s-username').value.trim();
+  const position=document.getElementById('s-position').value.trim();
+  const pfp=document.getElementById('s-pfp').value.trim();
+  if(!name||!position)return showToast('error','MISSING FIELDS','Name and Position are required.');
+  allStaff=[...allStaff,{name,username,position,pfp}];
+  try{
+    await fsPatch('goldi','staff',{members:allStaff});
+    renderStaffGrid(allStaff);renderStaffAdmin(allStaff);
+    ['s-name','s-username','s-position','s-pfp'].forEach(id=>document.getElementById(id).value='');
+    showToast('success','STAFF ADDED',`${name} added to the team.`);
+  }catch(e){allStaff.pop();showToast('error','SAVE FAILED',e.message);}
+}
+
+async function removeStaffMember(idx){
+  allStaff=allStaff.filter((_,i)=>i!==idx);
+  try{await fsPatch('goldi','staff',{members:allStaff});renderStaffGrid(allStaff);renderStaffAdmin(allStaff);showToast('success','REMOVED','Staff member removed.');}
+  catch(e){showToast('error','SAVE FAILED',e.message);}
+}
+
+// ═══ FIREBASE LOAD ═══
+async function loadFirebaseData(){
+  try{
+    const[config,sus,staff]=await Promise.all([fsRead('goldi','config'),fsRead('goldi','suspensions'),fsRead('goldi','staff')]);
+    if(config){
+      const dbAdmins=Array.isArray(config.adminIds)?config.adminIds.map(String):[];
+      fsConfig.adminIds=[...new Set([...HARDCODED_ADMIN_IDS.map(String),...dbAdmins])];
+      fsConfig.appealWebhook=config.appealWebhook||'';fsConfig.reportWebhook=config.reportWebhook||'';
+      fsConfig.discordClientId=config.discordClientId||'';fsConfig.redirectUri=config.redirectUri||'';
+      fsConfig.supabaseUrl=config.supabaseUrl||'';fsConfig.supabaseKey=config.supabaseKey||'';
+    }
+    if(sus&&Array.isArray(sus.data)){allSuspended=sus.data;fbLastUpdated=sus.lastUpdated||'';}
+    if(staff&&Array.isArray(staff.members)){allStaff=staff.members;renderStaffGrid(allStaff);}
+    else renderStaffGrid([]);
+    document.getElementById('appeal-webhook').value=fsConfig.appealWebhook;
+    document.getElementById('report-webhook').value=fsConfig.reportWebhook;
+    const userRaw=sessionStorage.getItem(DISCORD_USER_KEY);
+    if(userRaw){try{const u=JSON.parse(userRaw);applyDiscordUser(u);checkAndGrantAdmin(u.id);}catch{}}
+    if(fsConfig.supabaseUrl&&fsConfig.supabaseKey){fetchBotStats();setInterval(fetchBotStats,30000);}
+  }catch(e){showToast('error','DATABASE ERROR','Could not load config.');}
+  finally{
+    document.getElementById('fb-loading').style.display='none';
+    if(!isAdminUnlocked()){document.getElementById('admin-locked-banner').style.display='block';updateLockedBanner();}
+    const dateEl=document.getElementById('sus-last-updated');
+    if(dateEl&&fbLastUpdated)dateEl.textContent='Last updated: '+fbLastUpdated;
+  }
+}
+
+// ═══ ADMIN ═══
+function isAdminUnlocked(){return sessionStorage.getItem(ADMIN_SESSION_KEY)==='true';}
+function getLoggedInId(){try{return JSON.parse(sessionStorage.getItem(DISCORD_USER_KEY))?.id||'';}catch{return'';}}
+function checkAndGrantAdmin(id){
+  const ids=fsConfig.adminIds||[];
+  if(!ids.length)return false;
+  if(ids.map(String).includes(String(id))){sessionStorage.setItem(ADMIN_SESSION_KEY,'true');return true;}
+  return false;
+}
+function showAdminLogin(){
+  const raw=sessionStorage.getItem(DISCORD_USER_KEY);
+  if(!raw)return showToast('error','NOT LOGGED IN','Log in with Discord first.');
+  if(isAdminUnlocked()){openAdminIdsModal();return;}
+  if(checkAndGrantAdmin(JSON.parse(raw).id)){showAdminPanel();initSuspendedTab();}
+  else showToast('error','ACCESS DENIED','Your Discord ID is not in the admin list.');
+}
+function openAdminIdsModal(){
+  const dbIds=fsConfig.adminIds.filter(id=>!HARDCODED_ADMIN_IDS.map(String).includes(String(id)));
+  document.getElementById('admin-ids-textarea').value=dbIds.join('\n');
+  document.getElementById('admin-ids-error').style.display='none';
+  document.getElementById('admin-ids-modal').style.display='flex';
+}
+function closeAdminIdsModal(){document.getElementById('admin-ids-modal').style.display='none';}
+async function saveAdminIds(){
+  const raw=document.getElementById('admin-ids-textarea').value;
+  const ids=raw.split(/[\n,\s]+/).map(s=>s.trim()).filter(s=>/^\d{17,20}$/.test(s));
+  const errEl=document.getElementById('admin-ids-error');
+  if(!ids.length){errEl.textContent='No valid IDs found.';errEl.style.display='block';return;}
+  try{
+    await fsPatch('goldi','config',{adminIds:ids});
+    fsConfig.adminIds=[...new Set([...HARDCODED_ADMIN_IDS.map(String),...ids])];
+    closeAdminIdsModal();showToast('success','ADMIN IDS SAVED',`${ids.length} admin ID(s) saved.`);
+    updateLockedBanner();
+  }catch(e){showToast('error','SAVE FAILED',e.message);}
+}
+async function claimFirstAdmin(){
+  const raw=sessionStorage.getItem(DISCORD_USER_KEY);
+  if(!raw)return showToast('error','NOT LOGGED IN','Log in with Discord first.');
+  const user=JSON.parse(raw);
+  const dbAdmins=fsConfig.adminIds.filter(id=>!HARDCODED_ADMIN_IDS.map(String).includes(String(id)));
+  if(dbAdmins.length>0)return showToast('error','ALREADY SET UP','Admin IDs already configured.');
+  try{
+    await fsPatch('goldi','config',{adminIds:[String(user.id)]});
+    fsConfig.adminIds=[...new Set([...HARDCODED_ADMIN_IDS.map(String),String(user.id)])];
+    sessionStorage.setItem(ADMIN_SESSION_KEY,'true');
+    document.getElementById('admin-locked-banner').style.display='none';
+    showAdminPanel();initSuspendedTab();
+    showToast('success','FIRST ADMIN CLAIMED','Your Discord ID saved as admin.');
+  }catch(e){showToast('error','SAVE FAILED',e.message);}
+}
+function lockAdmin(){
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-locked-banner').style.display='block';
+  updateLockedBanner();showToast('success','PANEL LOCKED','Admin panel locked.');
+}
+function updateLockedBanner(){
+  const dbAdmins=fsConfig.adminIds.filter(id=>!HARDCODED_ADMIN_IDS.map(String).includes(String(id)));
+  const noAdmins=dbAdmins.length===0&&HARDCODED_ADMIN_IDS.length===0;
+  const loggedIn=!!sessionStorage.getItem(DISCORD_USER_KEY);
+  document.getElementById('admin-banner-unlock').style.display=(!noAdmins&&!isAdminUnlocked())?'flex':'none';
+  document.getElementById('admin-banner-claim').style.display=(noAdmins&&loggedIn)?'flex':'none';
+  document.getElementById('admin-banner-nologin').style.display=(noAdmins&&!loggedIn)?'flex':'none';
+}
+function showAdminPanel(){
+  document.getElementById('admin-locked-banner').style.display='none';
+  document.getElementById('admin-panel').style.display='block';
+  document.getElementById('appeal-webhook-admin').value=fsConfig.appealWebhook||'';
+  document.getElementById('report-webhook-admin').value=fsConfig.reportWebhook||'';
+  document.getElementById('discord-client-id').value=fsConfig.discordClientId||'';
+  document.getElementById('admin-supabase-url').value=fsConfig.supabaseUrl||'';
+  document.getElementById('admin-supabase-key').value=fsConfig.supabaseKey||'';
+  renderStaffAdmin(allStaff);
+}
+function toggleAdminPanel(){
+  const body=document.getElementById('admin-panel-body');const icon=document.getElementById('admin-toggle-icon');
+  body.classList.toggle('open');icon.textContent=body.classList.contains('open')?'▲':'▼';
+}
+async function saveAdminConfig(){
+  const update={};
+  const aw=document.getElementById('appeal-webhook-admin').value.trim();
+  const rw=document.getElementById('report-webhook-admin').value.trim();
+  const ci=document.getElementById('discord-client-id').value.trim();
+  const su=document.getElementById('admin-supabase-url').value.trim();
+  const sk=document.getElementById('admin-supabase-key').value.trim();
+  if(aw)update.appealWebhook=aw;if(rw)update.reportWebhook=rw;
+  if(ci)update.discordClientId=ci;if(su)update.supabaseUrl=su;if(sk)update.supabaseKey=sk;
+  try{
+    await fsPatch('goldi','config',update);Object.assign(fsConfig,update);
+    document.getElementById('appeal-webhook').value=fsConfig.appealWebhook||'';
+    document.getElementById('report-webhook').value=fsConfig.reportWebhook||'';
+    showToast('success','CONFIG SAVED','Settings saved — active on all devices instantly.');
+    if(su&&sk){fetchBotStats();setInterval(fetchBotStats,30000);}
+  }catch(e){showToast('error','SAVE FAILED',e.message);}
+}
+
+// ═══ SUSPENDED TAB ═══
+function initSuspendedTab(){
+  const dateEl=document.getElementById('sus-last-updated');
+  if(dateEl&&fbLastUpdated)dateEl.textContent='Last updated: '+fbLastUpdated;
+  if(isAdminUnlocked()){
+    showAdminPanel();
+    document.getElementById('user-view').style.display='none';
+    document.getElementById('admin-view').style.display='block';
+    if(allSuspended.length>0)renderAdminTable(allSuspended);
+  }else{
+    document.getElementById('admin-locked-banner').style.display='block';updateLockedBanner();
+    document.getElementById('admin-panel').style.display='none';
+    document.getElementById('user-view').style.display='block';
+    document.getElementById('admin-view').style.display='none';
+    const raw=sessionStorage.getItem(DISCORD_USER_KEY);
+    if(raw){try{renderUserView(JSON.parse(raw));}catch{}}
+    else{document.getElementById('sus-user-result').style.display='none';document.getElementById('sus-login-prompt').style.display='flex';}
+  }
+}
+function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag-over');}
+function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processJsonFile(f);}
+function handleFileUpload(e){const f=e.target.files[0];if(f)processJsonFile(f);}
+function processJsonFile(file){
+  if(!file.name.endsWith('.json'))return showToast('error','WRONG FILE TYPE','Please upload a .json file.');
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      let list=Array.isArray(data)?data:data.suspensions||data.users||data.data;
+      if(!list)throw new Error('Expected {suspensions:[...]}');
+      const now=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      showToast('success','UPLOADING…',`Saving ${list.length} records to Firestore…`);
+      await fsWrite('goldi','suspensions',{data:list,lastUpdated:now});
+      allSuspended=list;fbLastUpdated=now;
+      document.getElementById('sus-last-updated').textContent='Last updated: '+now;
+      renderAdminTable(allSuspended);
+      showToast('success','DATABASE UPDATED',`${list.length} suspended users saved.`);
+    }catch(err){showToast('error','PARSE ERROR','Could not read JSON: '+err.message);}
+  };reader.readAsText(file);
+}
+function filterSuspended(){
+  const q=document.getElementById('sus-search').value.toLowerCase();
+  renderAdminTable(q?allSuspended.filter(u=>String(u.user_id).includes(q)||(u.reason||'').toLowerCase().includes(q)):allSuspended);
+}
+function renderAdminTable(list){
+  if(!list||!list.length){setSusContent('<div class="sus-empty"><div class="sus-empty-icon">✓</div><p>No suspended users found.</p></div>');document.getElementById('sus-stats').style.display='none';return;}
+  document.getElementById('sus-stats').style.display='grid';
+  const perm=list.filter(u=>u.expires_at===null||u.expires_at===undefined).length;
+  const temp=list.length-perm;
+  setEl('stat-total',list.length);setEl('stat-perm',perm);setEl('stat-temp',temp);setEl('stat-warn',0);
+  const rows=list.map(u=>{
+    const isPerm=u.expires_at===null||u.expires_at===undefined;
+    return`<tr><td><div class="sus-id">${escHtml(String(u.user_id))}</div></td><td><span class="sus-badge ${isPerm?'perm':'temp'}">${isPerm?'PERM BAN':'TEMP BAN'}</span></td><td style="color:var(--text-muted);font-size:14px;">${escHtml(u.reason||'—')}</td><td style="font-size:13px;color:var(--text-dim);">${u.issued_at?tsToDate(u.issued_at):'—'}</td><td style="font-size:13px;color:var(--text-dim);">${u.expires_at?tsToDate(u.expires_at):(isPerm?'Never':'—')}</td><td style="font-size:12px;color:var(--text-dim);">${escHtml(String(u.issued_by||'—'))}</td></tr>`;
+  }).join('');
+  setSusContent(`<div class="sus-table-wrap"><table class="sus-table"><thead><tr><th>USER ID</th><th>STATUS</th><th>REASON</th><th>ISSUED</th><th>EXPIRES</th><th>ISSUED BY</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+function renderUserView(user){
+  document.getElementById('sus-login-prompt').style.display='none';
+  const result=document.getElementById('sus-user-result');result.style.display='block';
+  if(!allSuspended.length){result.innerHTML='<div class="sus-empty"><div class="sus-empty-icon">⌛</div><p>Suspension database not loaded yet.</p></div>';return;}
+  const match=allSuspended.find(u=>String(u.user_id)===String(user.id));
+  if(!match){
+    result.innerHTML=`<div class="logged-in-banner" style="flex-direction:column;align-items:flex-start;gap:6px;"><div style="display:flex;align-items:center;gap:10px;"><img src="${escHtml(user.avatar)}" style="width:32px;height:32px;border-radius:50%;"><strong style="color:var(--success);font-family:'Cinzel',serif;font-size:14px;letter-spacing:0.05em;">✓ NOT SUSPENDED</strong></div><div style="font-size:15px;color:var(--text-muted);">Logged in as <strong style="color:var(--text);">${escHtml(user.username)}</strong> — your account is in good standing.</div></div>`;
+  }else{
+    const isPerm=match.expires_at===null||match.expires_at===undefined;
+    result.innerHTML=`<div style="background:var(--danger-bg);border:0.5px solid rgba(201,80,58,0.35);border-radius:10px;padding:1.5rem;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;"><img src="${escHtml(user.avatar)}" style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(201,80,58,0.5);"><div><div style="font-family:'Cinzel',serif;font-size:13px;color:var(--danger);letter-spacing:0.08em;">⚠ ACCOUNT SUSPENDED</div><div style="font-size:15px;color:var(--text);margin-top:2px;">${escHtml(user.username)}</div></div><span class="sus-badge ${isPerm?'perm':'temp'}" style="margin-left:auto;">${isPerm?'PERMANENT BAN':'TEMPORARY BAN'}</span></div><div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:0.85rem 1rem;margin-bottom:10px;"><div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:4px;">REASON</div><div style="color:var(--text);font-size:16px;">${escHtml(match.reason||'—')}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:0.85rem 1rem;"><div style="font-family:'Cinzel',serif;font-size:10px;color:var(--text-dim);margin-bottom:4px;">ISSUED</div><div style="color:var(--text-muted);font-size:15px;">${match.issued_at?tsToDate(match.issued_at):'—'}</div></div><div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:0.85rem 1rem;"><div style="font-family:'Cinzel',serif;font-size:10px;color:var(--text-dim);margin-bottom:4px;">EXPIRES</div><div style="color:var(--text-muted);font-size:15px;">${match.expires_at?tsToDate(match.expires_at):'Never'}</div></div></div><div style="margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid rgba(201,80,58,0.2);font-size:14px;color:var(--text-dim);">If you believe this is a mistake, <a onclick="navTo('appeal');return false;" style="color:var(--gold-light);cursor:pointer;text-decoration:underline;">submit an appeal</a>.</div></div>`;
+  }
+}
+function tsToDate(ts){return new Date(ts*1000).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function setSusContent(h){document.getElementById('sus-content').innerHTML=h;}
+
+// ═══ FORMS ═══
+function isValidWebhook(url){return/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\/\d+\/.+/i.test(url.trim());}
+const GOLD_COLOR=0xC9973A,RED_COLOR=0xC9503A;
+let selectedType='',selectedSev='investigate';
+function selectType(el,val){document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedType=val;document.getElementById('r-type').value=val;}
+function selectSev(el,val){document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('selected-sev'));el.classList.add('selected-sev');selectedSev=val;document.getElementById('r-severity').value=val;}
+
+async function submitAppeal(){
+  const webhook=fsConfig.appealWebhook||'';
+  const username=document.getElementById('a-username').value.trim();
+  const userid=document.getElementById('a-userid').value.trim();
+  const server=document.getElementById('a-server').value.trim();
+  const date=document.getElementById('a-date').value;
+  const givenreason=document.getElementById('a-givenreason').value.trim();
+  const reason=document.getElementById('a-reason').value.trim();
+  const evidence=document.getElementById('a-evidence').value.trim();
+  if(!webhook||!isValidWebhook(webhook))return showToast('error','NOT CONFIGURED','Appeals not configured yet. Ask an admin to set the webhook.');
+  if(!username||!userid||!reason||!date)return showToast('error','MISSING FIELDS','Please fill in all required fields.');
+  const btn=document.querySelector('#page-appeal .submit-btn');btn.disabled=true;btn.textContent='SENDING…';
+  const embed={title:'📋 Appeal Submission',color:GOLD_COLOR,fields:[{name:'Discord Tag',value:username,inline:true},{name:'User ID',value:userid,inline:true},{name:'Server',value:server||'—',inline:true},{name:'Suspension Date',value:date,inline:true},{name:'Given Reason',value:givenreason||'—'},{name:'Appeal Reason',value:reason}],timestamp:new Date().toISOString(),footer:{text:'Goldi Bot — Appeal System'}};
+  if(evidence)embed.fields.push({name:'Evidence',value:evidence});
+  try{
+    const res=await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'Goldi Appeal System',content:'🔔 **New appeal submitted**',embeds:[embed]})});
+    if(res.ok||res.status===204){showToast('success','APPEAL SUBMITTED','Your appeal has been posted. You will be contacted within 72 hours.');['a-username','a-userid','a-server','a-date','a-givenreason','a-reason','a-evidence'].forEach(id=>document.getElementById(id).value='');}
+    else showToast('error','SEND FAILED','Discord returned error '+res.status+'.');
+  }catch{showToast('error','NETWORK ERROR','Could not reach Discord.');}
+  btn.disabled=false;btn.textContent='SUBMIT APPEAL ↗';
+}
+
+async function submitReport(){
+  const webhook=fsConfig.reportWebhook||'';
+  const reporter=document.getElementById('r-reporter').value.trim();
+  const reporterid=document.getElementById('r-reporterid').value.trim();
+  const target=document.getElementById('r-target').value.trim();
+  const targetid=document.getElementById('r-targetid').value.trim();
+  const type=document.getElementById('r-type').value;
+  const severity=document.getElementById('r-severity').value;
+  const desc=document.getElementById('r-desc').value.trim();
+  const evidence=document.getElementById('r-evidence').value.trim();
+  if(!webhook||!isValidWebhook(webhook))return showToast('error','NOT CONFIGURED','Reports not configured yet. Ask an admin to set the webhook.');
+  if(!reporter||!target||!targetid||!desc)return showToast('error','MISSING FIELDS','Please fill in all required fields.');
+  if(!type)return showToast('error','VIOLATION TYPE','Please select a violation type.');
+  const typeLabels={cheating:'Cheating / Alt Accounts',automation:'Automation / Bots',harassment:'Harassment / Spam',bug_abuse:'Bug Exploitation'};
+  const sevLabels={warn:'⚠️ Warn',temp_ban:'🔇 Temp Ban',perm_ban:'🔨 Perm Ban',investigate:'🔍 Investigate'};
+  const btn=document.querySelector('#page-report .submit-btn');btn.disabled=true;btn.textContent='SENDING…';
+  const embed={title:'🚨 User Report',color:RED_COLOR,fields:[{name:'Reported By',value:reporter+(reporterid?` (${reporterid})`:''),inline:true},{name:'Reported User',value:target,inline:true},{name:'User ID',value:targetid,inline:true},{name:'Violation Type',value:typeLabels[type]||type,inline:true},{name:'Suggested Action',value:sevLabels[severity]||severity,inline:true},{name:'Description',value:desc}],timestamp:new Date().toISOString(),footer:{text:'Goldi Bot — Report System'}};
+  if(evidence)embed.fields.push({name:'Evidence',value:evidence});
+  try{
+    const res=await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'Goldi Report System',content:'🔔 **New user report submitted**',embeds:[embed]})});
+    if(res.ok||res.status===204){showToast('success','REPORT SUBMITTED','Your report has been sent to the moderation team.');['r-reporter','r-reporterid','r-target','r-targetid','r-desc','r-evidence'].forEach(id=>document.getElementById(id).value='');selectedType='';document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));}
+    else showToast('error','SEND FAILED','Discord returned error '+res.status+'.');
+  }catch{showToast('error','NETWORK ERROR','Could not reach Discord.');}
+  btn.disabled=false;btn.textContent='SUBMIT REPORT ↗';
+}
+
+// ═══ DISCORD OAUTH ═══
+function startDiscordLogin(){
+  const clientId=fsConfig.discordClientId||'';
+  const redirectUri=fsConfig.redirectUri||window.location.href.split('#')[0];
+  if(!clientId){
+    document.getElementById('oauth-setup-modal').style.display='flex';
+    document.getElementById('setup-redirect-uri').value=redirectUri;
+    document.getElementById('setup-modal-error').style.display='none';
+    setTimeout(()=>document.getElementById('setup-client-id').focus(),100);
+    return;
+  }
+  window.location.href='https://discord.com/oauth2/authorize?'+new URLSearchParams({client_id:clientId,redirect_uri:redirectUri,response_type:'token',scope:'identify'}).toString();
+}
+function closeOAuthSetupModal(){document.getElementById('oauth-setup-modal').style.display='none';}
+async function saveOAuthSetupAndLogin(){
+  const clientId=document.getElementById('setup-client-id').value.trim();
+  const redirectUri=document.getElementById('setup-redirect-uri').value.trim()||window.location.href.split('#')[0];
+  const errEl=document.getElementById('setup-modal-error');
+  if(!clientId||!/^\d{17,20}$/.test(clientId)){errEl.textContent='Enter a valid Client ID (17–20 digits).';errEl.style.display='block';return;}
+  try{await fsPatch('goldi','config',{discordClientId:clientId,redirectUri});fsConfig.discordClientId=clientId;fsConfig.redirectUri=redirectUri;}catch{}
+  closeOAuthSetupModal();
+  window.location.href='https://discord.com/oauth2/authorize?'+new URLSearchParams({client_id:clientId,redirect_uri:redirectUri,response_type:'token',scope:'identify'}).toString();
+}
+function handleOAuthCallback(){
+  const hash=window.location.hash;
+  if(!hash||!hash.includes('access_token'))return;
+  const params=new URLSearchParams(hash.slice(1));
+  const token=params.get('access_token');if(!token)return;
+  history.replaceState(null,'',window.location.pathname+window.location.search);
+  fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+token}})
+    .then(r=>r.json())
+    .then(user=>{
+      const ud={id:user.id,username:user.username,discriminator:user.discriminator||'0',avatar:user.avatar?`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`:`https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id)>>22n)%6}.png`,token};
+      sessionStorage.setItem(DISCORD_USER_KEY,JSON.stringify(ud));
+      applyDiscordUser(ud);
+      showToast('success','LOGGED IN',`Welcome, ${ud.username}!`);
+      if(checkAndGrantAdmin(ud.id)){initSuspendedTab();showToast('success','ADMIN UNLOCKED','Your Discord ID has admin access.');}
+      else{document.getElementById('admin-locked-banner').style.display='block';updateLockedBanner();}
+    }).catch(()=>showToast('error','LOGIN FAILED','Could not fetch Discord user info.'));
+}
+function restoreDiscordUser(){const raw=sessionStorage.getItem(DISCORD_USER_KEY);if(!raw)return;try{applyDiscordUser(JSON.parse(raw));}catch{}}
+function applyDiscordUser(user){
+  const tag=user.discriminator&&user.discriminator!=='0'?`${user.username}#${user.discriminator}`:user.username;
+  document.getElementById('nav-auth').style.display='none';
+  document.getElementById('nav-user').style.display='flex';
+  document.getElementById('nav-avatar').src=user.avatar;
+  document.getElementById('nav-username-display').textContent=tag;
+  document.getElementById('a-username').value=tag;document.getElementById('a-userid').value=user.id;
+  document.getElementById('appeal-login-prompt').style.display='none';
+  document.getElementById('appeal-logged-in-banner').style.display='flex';
+  document.getElementById('appeal-avatar').src=user.avatar;
+  document.getElementById('appeal-logged-in-text').textContent=`Logged in as ${tag} — identity auto-filled.`;
+  document.getElementById('r-reporter').value=tag;document.getElementById('r-reporterid').value=user.id;
+  document.getElementById('report-login-prompt').style.display='none';
+  document.getElementById('report-logged-in-banner').style.display='flex';
+  document.getElementById('report-avatar').src=user.avatar;
+  document.getElementById('report-logged-in-text').textContent=`Logged in as ${tag} — identity auto-filled.`;
+  if(!isAdminUnlocked()&&document.getElementById('sus-user-result'))renderUserView(user);
+}
+function logoutDiscord(){
+  sessionStorage.removeItem(DISCORD_USER_KEY);sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  document.getElementById('nav-auth').style.display='flex';document.getElementById('nav-user').style.display='none';
+  document.getElementById('appeal-login-prompt').style.display='flex';document.getElementById('appeal-logged-in-banner').style.display='none';
+  document.getElementById('report-login-prompt').style.display='flex';document.getElementById('report-logged-in-banner').style.display='none';
+  ['a-username','a-userid','r-reporter','r-reporterid'].forEach(id=>document.getElementById(id).value='');
+  const ur=document.getElementById('sus-user-result');if(ur){ur.style.display='none';ur.innerHTML='';}
+  const lp=document.getElementById('sus-login-prompt');if(lp)lp.style.display='flex';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-locked-banner').style.display='block';updateLockedBanner();
+  showToast('success','LOGGED OUT','Discord session cleared.');
+}
+
+// ═══ INIT ═══
+window.addEventListener('DOMContentLoaded',()=>{
+  // Loading overlay
+  const ov=document.createElement('div');
+  ov.id='fb-loading';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(13,11,8,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;';
+  ov.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:13px;letter-spacing:0.2em;color:var(--gold);">GOLDI</div><div style="width:200px;height:1px;background:var(--border);position:relative;overflow:hidden;"><div style="position:absolute;height:1px;width:60px;background:var(--gold);animation:scan 1.2s ease-in-out infinite;"></div></div><div style="font-family:\'Cinzel\',serif;font-size:10px;letter-spacing:0.15em;color:var(--text-dim);">CONNECTING TO DATABASE…</div><style>@keyframes scan{0%{left:-60px}100%{left:200px}}</style>';
+  document.body.appendChild(ov);
+
+  // Show login prompts if not logged in
+  const loggedIn=!!sessionStorage.getItem(DISCORD_USER_KEY);
+  if(!loggedIn){
+    document.getElementById('appeal-login-prompt').style.display='flex';
+    document.getElementById('report-login-prompt').style.display='flex';
+  }
+
+  const hash=window.location.hash.replace('#','');
+  navTo(PAGES.includes(hash)?hash:'home');
+  handleOAuthCallback();
+  restoreDiscordUser();
+  loadFirebaseData();
+});
+</script>
+</body>
+</html>
