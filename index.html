@@ -1215,22 +1215,27 @@ async function saveOAuthSetupAndLogin(){
   closeOAuthSetupModal();
   window.location.href='https://discord.com/oauth2/authorize?'+new URLSearchParams({client_id:clientId,redirect_uri:redirectUri,response_type:'token',scope:'identify'}).toString();
 }
-function handleOAuthCallback(){
-  const hash=window.location.hash;
-  if(!hash||!hash.includes('access_token'))return;
-  const params=new URLSearchParams(hash.slice(1));
-  const token=params.get('access_token');if(!token)return;
-  history.replaceState(null,'',window.location.pathname+window.location.search);
-  fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+token}})
-    .then(r=>r.json())
+function handleOAuthCallback(rawHash){
+  const hash=rawHash||window.location.hash;
+  if(!hash||!hash.includes("access_token"))return;
+  const params=new URLSearchParams(hash.startsWith("#")?hash.slice(1):hash);
+  const token=params.get("access_token");if(!token)return;
+  const error=params.get("error");
+  if(error){showToast("error","LOGIN FAILED",params.get("error_description")||error);return;}
+  fetch("https://discord.com/api/users/@me",{headers:{Authorization:"Bearer "+token}})
+    .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
     .then(user=>{
-      const ud={id:user.id,username:user.username,discriminator:user.discriminator||'0',avatar:user.avatar?`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`:`https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id)>>22n)%6}.png`,token};
+      const avatarIndex=parseInt(user.id.slice(-4),10)%6;
+      const avatar=user.avatar
+        ?("https://cdn.discordapp.com/avatars/"+user.id+"/"+user.avatar+".png?size=128")
+        :("https://cdn.discordapp.com/embed/avatars/"+avatarIndex+".png");
+      const ud={id:user.id,username:user.username,discriminator:user.discriminator||"0",avatar,token};
       sessionStorage.setItem(DISCORD_USER_KEY,JSON.stringify(ud));
       applyDiscordUser(ud);
-      showToast('success','LOGGED IN',`Welcome, ${ud.username}!`);
-      if(checkAndGrantAdmin(ud.id)){initSuspendedTab();showToast('success','ADMIN UNLOCKED','Your Discord ID has admin access.');}
-      else{document.getElementById('admin-locked-banner').style.display='block';updateLockedBanner();}
-    }).catch(()=>showToast('error','LOGIN FAILED','Could not fetch Discord user info.'));
+      showToast("success","LOGGED IN","Welcome, "+ud.username+"!");
+      if(checkAndGrantAdmin(ud.id)){showToast("success","ADMIN UNLOCKED","Your Discord ID has admin access.");}
+      else{const b=document.getElementById("admin-locked-banner");if(b){b.style.display="block";updateLockedBanner();}}
+    }).catch(e=>{console.error("Discord API error:",e);showToast("error","LOGIN FAILED","Could not fetch Discord profile. Try again.");});
 }
 function restoreDiscordUser(){const raw=sessionStorage.getItem(DISCORD_USER_KEY);if(!raw)return;try{applyDiscordUser(JSON.parse(raw));}catch{}}
 function applyDiscordUser(user){
@@ -1273,6 +1278,20 @@ window.addEventListener('DOMContentLoaded',()=>{
   ov.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:13px;letter-spacing:0.2em;color:var(--gold);">GOLDI</div><div style="width:200px;height:1px;background:var(--border);position:relative;overflow:hidden;"><div style="position:absolute;height:1px;width:60px;background:var(--gold);animation:scan 1.2s ease-in-out infinite;"></div></div><div style="font-family:\'Cinzel\',serif;font-size:10px;letter-spacing:0.15em;color:var(--text-dim);">CONNECTING TO DATABASE…</div><style>@keyframes scan{0%{left:-60px}100%{left:200px}}</style>';
   document.body.appendChild(ov);
 
+  // ── OAuth MUST run first, before navTo wipes the hash ──
+  const rawHash = window.location.hash;
+  const isOAuthCallback = rawHash.includes('access_token') || rawHash.includes('error=');
+
+  if (isOAuthCallback) {
+    // Clear hash immediately so navTo picks up 'home', not token junk
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    navTo('home');
+    handleOAuthCallback(rawHash); // pass raw hash before it's gone
+  } else {
+    const page = rawHash.replace('#','');
+    navTo(PAGES.includes(page) ? page : 'home');
+  }
+
   // Show login prompts if not logged in
   const loggedIn=!!sessionStorage.getItem(DISCORD_USER_KEY);
   if(!loggedIn){
@@ -1280,9 +1299,6 @@ window.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('report-login-prompt').style.display='flex';
   }
 
-  const hash=window.location.hash.replace('#','');
-  navTo(PAGES.includes(hash)?hash:'home');
-  handleOAuthCallback();
   restoreDiscordUser();
   loadFirebaseData();
 });
