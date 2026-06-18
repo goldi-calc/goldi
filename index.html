@@ -649,45 +649,233 @@ select option{background:var(--card2);color:var(--text)}
 /* ═══════════════════════════════════════════
    MOBILE OVERRIDES  (≤ 768px)
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   MOBILE  (≤ 768px)
+═══════════════════════════════════════════ */
 @media(max-width:768px){
-  #desktop-nav{display:none}
-  #mobile-nav{display:flex}
-  #mobile-tabs{display:flex}
-  body{padding-bottom:var(--mob-bar)}
+  /* ── Show/hide nav elements ── */
+  #desktop-nav{display:none!important}
+  #mobile-nav{display:flex!important}
+  #mobile-tabs{display:flex!important}
+  body{padding-bottom:calc(var(--mob-bar) + env(safe-area-inset-bottom));font-size:16px}
 
-  .home-hero{padding:2rem 1.25rem 2rem}
-  .hero-avatar-wrap{width:88px;height:88px}
-  .hero-avatar-inner{width:80px;height:80px;font-size:34px}
-  .home-hero h1{font-size:2rem;letter-spacing:.07em}
-  .hero-desc{font-size:15px}
-  .cta-btn{font-size:10.5px;padding:11px 20px}
-  .hero-ctas{gap:8px}
-  .feature-chips{gap:6px}
-  .chip{font-size:9px;padding:5px 11px}
+  /* ── Ambient glows — smaller on mobile ── */
+  .ambient-1{width:300px;height:300px;opacity:.05}
+  .ambient-2{width:200px;height:200px;opacity:.05}
 
-  .section-wrap{padding:2rem 1.25rem}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .stat-card{padding:1.1rem 1.25rem}
-  .s-val{font-size:1.7rem}
+  /* ── MOBILE TOP BAR ── */
+  #mobile-nav{
+    height:54px;padding:0 1.1rem;
+    background:rgba(13,11,8,0.97);
+    border-bottom:1px solid var(--border);
+  }
+  .mob-coin{
+    width:30px;height:30px;font-size:14px;
+    box-shadow:0 0 14px rgba(201,151,58,.5);
+    animation:mobCoinPulse 3s ease-in-out infinite;
+  }
+  @keyframes mobCoinPulse{
+    0%,100%{box-shadow:0 0 14px rgba(201,151,58,.5)}
+    50%{box-shadow:0 0 22px rgba(201,151,58,.8),0 0 40px rgba(201,151,58,.2)}
+  }
+  .mob-brand{font-size:16px;letter-spacing:.14em}
+  .mob-login-btn{
+    font-size:9px;padding:7px 11px;border-radius:6px;
+    box-shadow:0 2px 10px rgba(88,101,242,.35);
+    letter-spacing:.06em;
+  }
+  .mob-avatar{width:28px;height:28px;border:2px solid var(--border-strong)}
 
-  .bot-card{padding:1.25rem;gap:1rem}
-  .bot-card-avatar{width:58px;height:58px;font-size:22px}
-  .bot-card-name{font-size:17px}
+  /* ── BOTTOM TAB BAR ── */
+  #mobile-tabs{
+    height:calc(var(--mob-bar) + env(safe-area-inset-bottom));
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(13,11,8,0.98);
+    border-top:1px solid var(--border);
+    box-shadow:0 -8px 32px rgba(0,0,0,.4);
+  }
+  .mob-tab{font-size:9px;letter-spacing:.05em;gap:4px}
+  .mob-tab-icon{font-size:20px}
+  .mob-tab.active .mob-tab-icon{
+    filter:drop-shadow(0 0 6px var(--gold));
+  }
 
-  .features-grid{grid-template-columns:1fr}
-  .staff-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .s-pfp{width:54px;height:54px;font-size:20px}
-  .s-name{font-size:12px}
+  /* ── HOME HERO — mobile card feel ── */
+  .home-hero{
+    padding:2rem 1.1rem 1.5rem;
+    background:linear-gradient(180deg,rgba(201,151,58,.04) 0%,transparent 60%);
+  }
+  .hero-glow{width:280px;height:180px;opacity:.6}
+  .hero-avatar-wrap{
+    width:92px;height:92px;
+    box-shadow:0 0 40px rgba(201,151,58,.2),0 0 80px rgba(201,151,58,.08);
+    margin-bottom:1.4rem;
+  }
+  .hero-avatar-inner{width:84px;height:84px;font-size:36px}
+  .home-hero h1{
+    font-size:1.9rem;letter-spacing:.06em;margin-bottom:.3rem;
+    /* Shimmer animation on mobile */
+    background-size:200% auto;
+    animation:shimmerText 4s linear infinite;
+  }
+  @keyframes shimmerText{
+    0%{background-position:0% center}
+    100%{background-position:200% center}
+  }
+  .hero-subtitle{font-size:10px;letter-spacing:.12em;margin-bottom:.75rem}
+  .hero-desc{font-size:14.5px;line-height:1.7;margin-bottom:1.4rem;padding:0 .5rem}
+  .status-row{margin-bottom:1.5rem}
+  .status-pill{font-size:9.5px;padding:5px 12px}
 
+  /* Hero CTAs — full-width stack on mobile */
+  .hero-ctas{
+    flex-direction:column;align-items:stretch;gap:10px;
+    margin-bottom:1.75rem;padding:0 .25rem;
+  }
+  .cta-btn{
+    font-size:11px;padding:14px 20px;
+    justify-content:center;border-radius:8px;
+    /* Touch ripple feel */
+    transition:transform .1s,box-shadow .1s,opacity .1s;
+  }
+  .cta-btn:active{transform:scale(0.97)!important;opacity:.9}
+  .cta-primary{box-shadow:0 4px 20px rgba(201,151,58,.35)}
+
+  /* Feature chips — horizontal scroll, no wrap */
+  .feature-chips{
+    flex-wrap:nowrap;overflow-x:auto;
+    justify-content:flex-start;
+    padding:0 0 8px;margin-bottom:0;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    gap:8px;
+    /* Fade edges */
+    -webkit-mask:linear-gradient(90deg,transparent,black 8%,black 92%,transparent);
+    mask:linear-gradient(90deg,transparent,black 8%,black 92%,transparent);
+  }
+  .feature-chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex-shrink:0;font-size:9.5px;padding:6px 13px;
+    border-radius:20px;/* pill shape on mobile */
+    white-space:nowrap;
+  }
+  .chip:active{transform:scale(0.94)!important}
+
+  /* ── LIVE TICKER ── */
+  .ticker-wrap{height:34px}
+  .ticker-inner{gap:2rem;padding:0 1rem;font-size:9.5px}
+  .t-item{font-size:9.5px}
+
+  /* ── BOT INFO CARD ── */
+  .section-wrap{padding:1.5rem 1.1rem}
+  .section-title{font-size:10px;letter-spacing:.14em;margin-bottom:1.25rem}
+  .bot-card{
+    padding:1.25rem;gap:1rem;border-radius:14px;
+    /* Pressed feel on tap */
+    transition:transform .15s,box-shadow .15s;
+  }
+  .bot-card:active{transform:scale(0.99)}
+  .bot-card-avatar{width:56px;height:56px;font-size:22px;border-radius:14px}
+  .bot-card-name{font-size:16px;margin-bottom:2px}
+  .bot-card-id{font-size:10px;margin-bottom:8px}
+  .bot-card-desc{font-size:14.5px;line-height:1.65;margin-bottom:10px}
+  .bot-card-tags{gap:5px}
+  .btag{font-size:9px;padding:3px 8px}
+
+  /* ── STATS GRID ── */
+  .stats-grid{
+    grid-template-columns:1fr 1fr;
+    border-radius:14px;gap:1px;
+  }
+  .stat-card{padding:1.1rem 1rem}
+  .s-label{font-size:8.5px}
+  .s-val{font-size:1.6rem}
+  .s-sub{font-size:9px}
+  /* Uptime card full width */
+  .stat-card:has(.uptime-row){grid-column:1/-1}
+  .uptime-row{gap:.5rem}
+  .up-num{font-size:1.5rem}
+  .up-sep{font-size:1.5rem}
+  .up-lbl{font-size:8px}
+  .spark-wrap{border-radius:10px;padding:1rem 1.1rem}
+  .spark-lbl{font-size:8.5px}
+
+  /* ── FEATURES GRID — horizontal scroll cards ── */
+  .features-grid{
+    display:flex;flex-direction:row;
+    overflow-x:auto;gap:12px;
+    padding-bottom:8px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    -webkit-mask:linear-gradient(90deg,transparent,black 5%,black 95%,transparent);
+    mask:linear-gradient(90deg,transparent,black 5%,black 95%,transparent);
+  }
+  .features-grid::-webkit-scrollbar{display:none}
+  .feat-card{
+    flex-shrink:0;width:220px;border-radius:14px;
+    padding:1.25rem 1.1rem;
+  }
+  .feat-card:active{transform:scale(0.97)!important}
+  .feat-icon{font-size:24px;margin-bottom:.6rem}
+  .feat-title{font-size:11.5px}
+  .feat-desc{font-size:13.5px;line-height:1.6}
+
+  /* ── STAFF GRID — 2 col ── */
+  .staff-grid{
+    grid-template-columns:repeat(2,1fr);gap:10px;
+  }
+  .staff-card{padding:1.1rem .9rem;border-radius:12px}
+  .staff-card:active{transform:scale(0.97)!important}
+  .s-pfp{width:52px;height:52px;font-size:20px;margin-bottom:.6rem}
+  .s-name{font-size:11.5px}
+  .s-user{font-size:9.5px}
+  .s-role{font-size:8.5px;padding:3px 8px}
+
+  /* ── FORMS ── */
+  .page-wrap{padding:1.5rem 1.1rem calc(var(--mob-bar) + 2rem)}
+  .page-header{margin-bottom:1.75rem;padding-bottom:1.5rem}
+  .page-header h1{font-size:1.5rem}
+  .page-badge{font-size:9px}
   .form-row{grid-template-columns:1fr}
   .add-staff-row{grid-template-columns:1fr}
   .type-grid{grid-template-columns:1fr 1fr}
-  .page-wrap{padding:1.75rem 1.25rem 5rem}
-  .toast{bottom:calc(var(--mob-bar) + 1rem);left:1rem;right:1rem;max-width:none}
-  .modal-box{padding:1.5rem}
+  .type-card{padding:.8rem .6rem;border-radius:10px}
+  .type-card:active{transform:scale(0.96)!important}
+  .type-icon{font-size:20px}
+  .type-label{font-size:9.5px}
+  .form-intro{font-size:14.5px;border-radius:10px}
+  .form-footer{flex-direction:column;align-items:stretch}
+  .submit-btn{width:100%;padding:15px;font-size:12px;border-radius:8px;text-align:center}
+  .submit-btn:active{transform:scale(0.98)!important}
+  input,textarea,select{font-size:16px!important;/* prevent iOS zoom */border-radius:8px;padding:12px 14px}
+
+  /* ── SUSPENDED TABLE ── */
   .sus-stats{grid-template-columns:1fr 1fr}
-  .up-num{font-size:1.4rem}
-  .up-sep{font-size:1.4rem}
+  .sus-table-wrap{border-radius:10px}
+  .sus-table th,.sus-table td{padding:9px 12px;font-size:12px}
+
+  /* ── TOAST ── */
+  .toast{
+    bottom:calc(var(--mob-bar) + .75rem);
+    left:.75rem;right:.75rem;max-width:none;
+    border-radius:12px;padding:.9rem 1.1rem;font-size:15px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay{align-items:flex-end}
+  .modal-box{
+    border-radius:20px 20px 0 0;
+    max-width:100%;padding:1.5rem 1.25rem 2rem;
+    animation:sheetUp .3s var(--ease-spring) both;
+    margin:0;
+  }
+  @keyframes sheetUp{
+    from{transform:translateY(100%);opacity:.6}
+    to{transform:translateY(0);opacity:1}
+  }
+
+  /* ── ADMIN PANEL ── */
+  .api-config{border-radius:12px}
+  .staff-admin-grid{grid-template-columns:1fr}
+  .add-staff-form{border-radius:10px}
 }
 
 /* ═══════════════════════════════════════════
@@ -696,6 +884,8 @@ select option{background:var(--card2);color:var(--text)}
 @media(min-width:769px){
   #mobile-nav{display:none!important}
   #mobile-tabs{display:none!important}
+  #more-menu{display:none!important}
+  #more-backdrop{display:none!important}
   .home-hero{padding:5.5rem 2rem 4rem}
 }
 </style>
@@ -775,9 +965,7 @@ select option{background:var(--card2);color:var(--text)}
      MOBILE TOP BAR
 ════════════════════════════════════════ -->
 <div id="mobile-nav">
-  <div class="mob-brand">
-    <div class="mob-coin">G</div>GOLDI
-  </div>
+  <div class="mob-brand"><div class="mob-coin">G</div>GOLDI</div>
   <div class="mob-right">
     <div id="mob-auth">
       <button class="mob-login-btn" onclick="startDiscordLogin()">
@@ -785,8 +973,9 @@ select option{background:var(--card2);color:var(--text)}
         LOGIN
       </button>
     </div>
-    <div id="mob-user" style="display:none;">
-      <img id="mob-avatar" class="mob-avatar" src="" alt="">
+    <div id="mob-user" style="display:none;align-items:center;gap:8px;">
+      <img id="mob-avatar" class="mob-avatar" src="" alt="" onclick="toggleMoreMenu()" style="cursor:pointer;">
+      <button onclick="logoutDiscord()" style="background:none;border:none;color:var(--text-dim);font-size:16px;cursor:pointer;padding:4px;">&#x2715;</button>
     </div>
   </div>
 </div>
@@ -796,7 +985,7 @@ select option{background:var(--card2);color:var(--text)}
 ════════════════════════════════════════ -->
 <div id="mobile-tabs">
   <button class="mob-tab active" id="mtab-home" onclick="navTo('home')">
-    <span class="mob-tab-icon">🏠</span><span>HOME</span>
+    <span class="mob-tab-icon">⚔️</span><span>HOME</span>
   </button>
   <button class="mob-tab" id="mtab-appeal" onclick="navTo('appeal')">
     <span class="mob-tab-icon">📋</span><span>APPEAL</span>
@@ -812,17 +1001,21 @@ select option{background:var(--card2);color:var(--text)}
   </button>
 </div>
 
-<!-- Mobile "More" slide-up menu -->
-<div id="more-menu" style="display:none;position:fixed;bottom:var(--mob-bar);left:0;right:0;z-index:199;background:rgba(20,18,13,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:1.25rem 1.5rem;animation:slideUp .25s var(--ease-spring) both;">
-  <div style="font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.15em;color:var(--text-dim);margin-bottom:1rem;">MORE PAGES</div>
-  <div style="display:flex;flex-direction:column;gap:0;">
-    <a onclick="navTo('privacy');closeMoreMenu();return false;" style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--text-muted);padding:.75rem 0;border-bottom:1px solid var(--border);text-decoration:none;display:flex;align-items:center;gap:10px;transition:color .15s;">📄 PRIVACY POLICY</a>
-    <a onclick="navTo('tos');closeMoreMenu();return false;" style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--text-muted);padding:.75rem 0;border-bottom:1px solid var(--border);text-decoration:none;display:flex;align-items:center;gap:10px;transition:color .15s;">📜 TERMS OF SERVICE</a>
-    <a href="https://discord.gg/F7JJG8cw8w" target="_blank" onclick="closeMoreMenu()" style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--blurple);padding:.75rem 0;text-decoration:none;display:flex;align-items:center;gap:10px;">💬 JOIN DISCORD ↗</a>
+<!-- Mobile slide-up sheet -->
+<div id="more-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(18,15,10,0.98);backdrop-filter:blur(24px);border-top:1px solid var(--border-strong);border-radius:20px 20px 0 0;padding:0 0 calc(var(--mob-bar) + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.6);">
+  <div style="display:flex;justify-content:center;padding:12px 0 8px;">
+    <div style="width:36px;height:4px;border-radius:2px;background:rgba(201,151,58,.25);"></div>
   </div>
+  <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:var(--text-dim);padding:.5rem 1.5rem .75rem;">NAVIGATION</div>
+  <a onclick="navTo('privacy');closeMoreMenu();return false;" style="font-family:'Cinzel',serif;font-size:14px;letter-spacing:.07em;color:var(--text-muted);padding:.9rem 1.5rem;border-top:1px solid var(--border);text-decoration:none;display:flex;align-items:center;gap:14px;">
+    <span style="font-size:20px;width:28px;text-align:center;">📄</span>PRIVACY POLICY</a>
+  <a onclick="navTo('tos');closeMoreMenu();return false;" style="font-family:'Cinzel',serif;font-size:14px;letter-spacing:.07em;color:var(--text-muted);padding:.9rem 1.5rem;border-top:1px solid var(--border);text-decoration:none;display:flex;align-items:center;gap:14px;">
+    <span style="font-size:20px;width:28px;text-align:center;">📜</span>TERMS OF SERVICE</a>
+  <a href="https://discord.gg/F7JJG8cw8w" target="_blank" onclick="closeMoreMenu()" style="font-family:'Cinzel',serif;font-size:14px;letter-spacing:.07em;color:var(--blurple);padding:.9rem 1.5rem;border-top:1px solid var(--border);text-decoration:none;display:flex;align-items:center;gap:14px;">
+    <span style="font-size:20px;width:28px;text-align:center;">💬</span>JOIN DISCORD ↗</a>
 </div>
-<div id="more-backdrop" style="display:none;position:fixed;inset:0;z-index:198;" onclick="closeMoreMenu()"></div>
-<style>@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}</style>
+<div id="more-backdrop" style="display:none;position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);" onclick="closeMoreMenu()"></div>
+<style>@keyframes sheetUp{from{transform:translateY(100%);opacity:.5}to{transform:translateY(0);opacity:1}}@keyframes sheetDown{from{transform:translateY(0);opacity:1}to{transform:translateY(100%);opacity:.3}}</style>
 
 <!-- ════════════════════════════════════════
      APP PAGES
@@ -1287,12 +1480,18 @@ function toggleMoreMenu(){
   const m=document.getElementById('more-menu');
   const b=document.getElementById('more-backdrop');
   const showing=m.style.display==='block';
-  m.style.display=showing?'none':'block';
-  b.style.display=showing?'none':'block';
+  if(!showing){
+    m.style.display='block';m.style.animation='sheetUp .32s var(--ease-spring) both';
+    b.style.display='block';
+  }else{
+    m.style.animation='sheetDown .22s ease-in both';
+    setTimeout(()=>{m.style.display='none';b.style.display='none';},200);
+  }
 }
 function closeMoreMenu(){
-  document.getElementById('more-menu').style.display='none';
-  document.getElementById('more-backdrop').style.display='none';
+  const m=document.getElementById('more-menu');const b=document.getElementById('more-backdrop');
+  m.style.animation='sheetDown .22s ease-in both';
+  setTimeout(()=>{m.style.display='none';b.style.display='none';},200);
 }
 
 // ═══ FIRESTORE ═══
