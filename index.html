@@ -412,11 +412,46 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .spfp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .sname{font-family:'Cinzel',serif;font-size:12.5px;letter-spacing:.05em;color:var(--text);margin-bottom:2px}
 .suser{font-family:var(--mono);font-size:9.5px;color:var(--text-dim);margin-bottom:7px}
+/* ── Role badges — each role gets a unique colour ── */
 .srole{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.1em;
-  padding:3px 9px;border-radius:3px;
+  padding:3px 10px;border-radius:3px;display:inline-block;
   background:rgba(180,130,40,.1);border:1px solid var(--border-strong);color:var(--gold-light)}
-.srole.admin{background:rgba(184,68,46,.1);border-color:rgba(184,68,46,.3);color:var(--danger)}
-.srole.owner{background:rgba(180,130,40,.15);border-color:var(--gold-dim);color:var(--gold-pale)}
+/* Owner / Founder — gold crown */
+.srole.r-owner{
+  background:linear-gradient(135deg,rgba(237,216,144,.15),rgba(180,130,40,.18));
+  border-color:rgba(237,216,144,.5);color:#EDD890;
+  box-shadow:0 0 8px rgba(237,216,144,.12)}
+/* Developer — electric blue */
+.srole.r-dev{
+  background:rgba(64,120,220,.14);border-color:rgba(64,120,220,.4);color:#7EB4FF}
+/* Admin — danger red */
+.srole.r-admin{
+  background:rgba(184,68,46,.12);border-color:rgba(184,68,46,.38);color:#E8806A}
+/* Moderator — teal */
+.srole.r-mod{
+  background:rgba(40,160,140,.12);border-color:rgba(40,160,140,.38);color:#6ECFBF}
+/* Artist — violet */
+.srole.r-artist{
+  background:rgba(140,60,200,.12);border-color:rgba(140,60,200,.38);color:#C490F0}
+/* Staff — default silver */
+.srole.r-staff{
+  background:rgba(180,170,150,.08);border-color:rgba(180,170,150,.25);color:#A8A090}
+
+/* Card border accent per role */
+.scard[data-role="owner"]{border-top:2px solid rgba(237,216,144,.45)}
+.scard[data-role="dev"]{border-top:2px solid rgba(64,120,220,.45)}
+.scard[data-role="admin"]{border-top:2px solid rgba(184,68,46,.45)}
+.scard[data-role="mod"]{border-top:2px solid rgba(40,160,140,.45)}
+.scard[data-role="artist"]{border-top:2px solid rgba(140,60,200,.45)}
+.scard[data-role="staff"]{border-top:2px solid rgba(180,170,150,.2)}
+
+/* Avatar border glow per role on hover */
+.scard[data-role="owner"]:hover .spfp{border-color:rgba(237,216,144,.7);box-shadow:0 0 12px rgba(237,216,144,.2)}
+.scard[data-role="dev"]:hover .spfp{border-color:rgba(64,120,220,.7);box-shadow:0 0 12px rgba(64,120,220,.2)}
+.scard[data-role="admin"]:hover .spfp{border-color:rgba(184,68,46,.7);box-shadow:0 0 12px rgba(184,68,46,.2)}
+.scard[data-role="mod"]:hover .spfp{border-color:rgba(40,160,140,.7);box-shadow:0 0 12px rgba(40,160,140,.2)}
+.scard[data-role="artist"]:hover .spfp{border-color:rgba(140,60,200,.7);box-shadow:0 0 12px rgba(140,60,200,.2)}
+
 .staff-empty{grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);font-style:italic;font-size:15px}
 
 /* ══════════════════════════════
@@ -619,8 +654,8 @@ select option{background:var(--card2);color:var(--text)}
 .acb{display:none}.acb.open{display:block}
 .asb{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;padding:7px 16px;border-radius:5px;border:1px solid var(--border-strong);background:transparent;color:var(--gold);cursor:pointer;margin-top:3px;transition:background .18s,transform .1s}
 .asb:hover{background:rgba(180,130,40,.1);transform:translateY(-1px)}
-.udz{border:1.5px dashed var(--border-strong);border-radius:var(--radius);padding:1.75rem;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:var(--card2)}
-.udz:hover,.udz.drag-over{border-color:var(--gold);background:rgba(180,130,40,.05)}
+
+
 .sag{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:.9rem}
 .sacard{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1.1rem;display:flex;gap:10px;align-items:flex-start}
 .sapfp{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border-strong);background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;color:var(--gold-dim);overflow:hidden;position:relative}
@@ -1445,14 +1480,24 @@ select option{background:var(--card2);color:var(--text)}
         </div>
         <div class="acb open" id="admin-panel-body">
           <div style="margin-bottom:1.4rem;">
-            <label style="display:block;margin-bottom:6px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--text-dim);">UPLOAD SUSPENDED USERS (JSON)</label>
-            <div class="udz" id="upload-zone" onclick="document.getElementById('json-file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
-              <div style="font-size:1.75rem;margin-bottom:.4rem;">📂</div>
-              <div style="font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:.07em;color:var(--gold-light);margin-bottom:3px;">Click to upload or drag &amp; drop</div>
-              <div style="font-size:12.5px;color:var(--text-dim);font-style:italic;">JSON from <code style="font-family:monospace;background:rgba(0,0,0,.25);padding:1px 4px;border-radius:3px;font-size:11px;">!exportsus</code></div>
+            <label style="display:block;margin-bottom:8px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--text-dim);">SUSPENDED USERS — SUPABASE SYNC</label>
+            <div style="background:rgba(78,140,86,.06);border:1px solid rgba(78,140,86,.22);border-radius:var(--radius);padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div id="sus-sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-dim);flex-shrink:0;transition:background .3s;"></div>
+                <div>
+                  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.07em;color:var(--text);" id="sus-sync-label">Not synced yet</div>
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px;" id="sus-sync-sub">Configure Supabase below, then sync</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="asb" onclick="syncSuspensionsFromSupabase()" id="sync-btn" style="color:var(--success);border-color:rgba(78,140,86,.35);">↻ SYNC NOW</button>
+                <button class="asb" onclick="startAutoSync()" id="auto-sync-btn">⏱ AUTO SYNC</button>
+              </div>
             </div>
-            <input type="file" id="json-file-input" accept=".json" style="display:none;" onchange="handleFileUpload(event)">
-            <div class="conf-note" style="margin-top:7px;"><strong>Expected format:</strong> <code>{"suspensions":[{"user_id":123,"reason":"…","issued_by":456,"issued_at":1234567890.0,"expires_at":null}]}</code></div>
+            <div class="conf-note" style="margin-top:7px;">
+              <strong>Supabase table required:</strong> <code>suspensions</code> with columns <code>user_id</code>, <code>reason</code>, <code>issued_by</code>, <code>issued_at</code>, <code>expires_at</code>.<br>
+              Set your Supabase URL + Anon Key below, then hit <strong>Sync Now</strong>. Auto Sync refreshes every 60 seconds.
+            </div>
           </div>
 
           <div style="border-top:1px solid var(--border);padding-top:1.4rem;margin-bottom:1.4rem;">
@@ -1488,7 +1533,7 @@ select option{background:var(--card2);color:var(--text)}
         <svg width="18" height="14" viewBox="0 0 16 12" fill="none"><path d="M13.545 1.033A13.194 13.194 0 0010.27 0c-.14.255-.304.6-.417.872a12.233 12.233 0 00-3.706 0A9.193 9.193 0 005.73 0 13.181 13.181 0 002.45 1.037C.352 4.125-.216 7.135.068 10.1a13.292 13.292 0 004.072 2.067c.329-.45.621-.927.873-1.43a8.679 8.679 0 01-1.375-.666c.115-.085.228-.172.337-.261 2.651 1.228 5.525 1.228 8.144 0 .11.09.223.176.337.261-.438.261-.9.488-1.378.668.252.504.544.98.874 1.428a13.267 13.267 0 004.074-2.065c.334-3.506-.568-6.487-2.48-9.069zM5.35 8.27c-.8 0-1.458-.743-1.458-1.651 0-.908.64-1.653 1.458-1.653.817 0 1.47.745 1.457 1.653 0 .908-.64 1.651-1.457 1.651zm5.3 0c-.8 0-1.457-.743-1.457-1.651 0-.908.64-1.653 1.457-1.653.818 0 1.47.745 1.457 1.653 0 .908-.637 1.651-1.457 1.651z" fill="#7289da"/></svg>
         <span>Log in with Discord to check if your account is suspended. &nbsp;<a onclick="startDiscordLogin()" style="cursor:pointer;">Login →</a></span>
       </div>
-      <div id="sus-user-result"><div class="se"><div class="sei">⌛</div><p>Loading database…</p></div></div>
+      <div id="sus-user-result"><div class="se"><div class="sei">⌛</div><p>Syncing suspension database…</p></div></div>
     </div>
 
     <div id="admin-view" style="display:none;">
@@ -1499,7 +1544,7 @@ select option{background:var(--card2);color:var(--text)}
         <div class="ss"><div class="sv" id="stat-warn">0</div><div class="sl">WARNINGS</div></div>
       </div>
       <div class="sus-tb"><input type="text" class="sus-search" id="sus-search" placeholder="Search by user ID or reason…" oninput="filterSuspended()"></div>
-      <div id="sus-content"><div class="se"><div class="sei">🔨</div><p>No data loaded yet.<br><span style="font-size:13px;color:var(--text-dim);">Upload JSON via the admin panel above.</span></p></div></div>
+      <div id="sus-content"><div class="se"><div class="sei">🔨</div><p>No data yet.<br><span style="font-size:13px;color:var(--text-dim);">Hit Sync Now in the admin panel, or configure Supabase credentials.</span></p></div></div>
     </div>
   </div>
 </div>
@@ -1680,28 +1725,82 @@ function drawSpark(data){
 
 // ═══ STAFF ═══
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function roleClass(pos){if(!pos)return'';const p=pos.toLowerCase();if(p.includes('owner')||p.includes('founder'))return'owner';if(p.includes('admin')||p.includes('dev'))return'admin';return'';}
+
+// Role detection — returns key string
+function getRoleKey(pos){
+  if(!pos)return'staff';
+  const p=pos.toLowerCase();
+  if(p.includes('owner')||p.includes('founder'))return'owner';
+  if(p.includes('dev'))return'dev';
+  if(p.includes('admin'))return'admin';
+  if(p.includes('mod'))return'mod';
+  if(p.includes('artist'))return'artist';
+  return'staff';
+}
+
+// Sort order: owner → dev → admin → mod → artist → staff
+const ROLE_ORDER={owner:0,dev:1,admin:2,mod:3,artist:4,staff:5};
+
+function sortStaff(list){
+  return [...list].sort((a,b)=>{
+    const ra=ROLE_ORDER[getRoleKey(a.position)]??5;
+    const rb=ROLE_ORDER[getRoleKey(b.position)]??5;
+    return ra!==rb?ra-rb:(a.name||'').localeCompare(b.name||'');
+  });
+}
+
+// Role display label (capitalise properly)
+function getRoleLabel(pos){
+  if(!pos)return'Staff';
+  const p=pos.toLowerCase();
+  if(p.includes('owner'))return'Owner';
+  if(p.includes('founder'))return'Founder';
+  if(p.includes('dev'))return'Developer';
+  if(p.includes('admin'))return'Admin';
+  if(p.includes('mod'))return'Moderator';
+  if(p.includes('artist'))return'Artist';
+  return pos;
+}
 
 function renderStaff(list){
   const g=document.getElementById('staff-grid');if(!g)return;
   if(!list||!list.length){g.innerHTML='<div class="staff-empty">No staff members yet. Admins can add them via the Admin Panel.</div>';return;}
-  g.innerHTML=list.map(m=>`<div class="scard">
-    <div class="spfp">${m.pfp?`<img src="${esc(m.pfp)}" alt="" onerror="this.style.display='none'">`:''}${!m.pfp?esc((m.name||'?')[0].toUpperCase()):''}</div>
-    <div class="sname">${esc(m.name||'Unknown')}</div>
-    <div class="suser">@${esc(m.username||'—')}</div>
-    <span class="srole ${roleClass(m.position)}">${esc(m.position||'Staff')}</span>
-  </div>`).join('');
+  const sorted=sortStaff(list);
+  g.innerHTML=sorted.map(m=>{
+    const rk=getRoleKey(m.position);
+    const rl=getRoleLabel(m.position);
+    return`<div class="scard" data-role="${rk}">
+      <div class="spfp">${m.pfp?`<img src="${esc(m.pfp)}" alt="" onerror="this.style.display='none'">`:''}${!m.pfp?esc((m.name||'?')[0].toUpperCase()):''}</div>
+      <div class="sname">${esc(m.name||'Unknown')}</div>
+      <div class="suser">@${esc(m.username||'—')}</div>
+      <span class="srole r-${rk}">${esc(rl)}</span>
+    </div>`;
+  }).join('');
 }
 
 function renderStaffAdmin(list){
   const el=document.getElementById('staff-admin-list');if(!el)return;
   if(!list||!list.length){el.innerHTML='<div style="color:var(--text-dim);font-style:italic;font-size:13.5px;padding:6px 0;">No staff members yet.</div>';return;}
-  el.innerHTML=list.map((m,i)=>`<div class="sacard">
-    <div class="sapfp">${m.pfp?`<img src="${esc(m.pfp)}" alt="" onerror="this.style.display='none'">`:(m.name||'?')[0].toUpperCase()}</div>
-    <div class="sabd"><div class="san">${esc(m.name||'Unknown')}</div><div class="sau">@${esc(m.username||'—')}</div><span class="sap">${esc(m.position||'Staff')}</span></div>
-    <button class="rsbtn" onclick="removeStaff(${i})" title="Remove">✕</button>
-  </div>`).join('');
+  const sorted=sortStaff(list);
+  el.innerHTML=sorted.map((m)=>{
+    // find original index for removal
+    const origIdx=list.findIndex(x=>x.name===m.name&&x.username===m.username);
+    const rk=getRoleKey(m.position);
+    const rl=getRoleLabel(m.position);
+    return`<div class="sacard" style="border-left:2.5px solid var(--rc-${rk},var(--border));">
+      <div class="sapfp">${m.pfp?`<img src="${esc(m.pfp)}" alt="" onerror="this.style.display='none'">`:(m.name||'?')[0].toUpperCase()}</div>
+      <div class="sabd"><div class="san">${esc(m.name||'Unknown')}</div><div class="sau">@${esc(m.username||'—')}</div><span class="sap srole r-${rk}" style="font-size:8px;">${esc(rl)}</span></div>
+      <button class="rsbtn" onclick="removeStaff(${origIdx})" title="Remove">✕</button>
+    </div>`;
+  }).join('');
 }
+
+// inject role colour CSS vars (easier than managing per-element styles)
+(function injectRoleVars(){
+  const s=document.createElement('style');
+  s.textContent=`:root{--rc-owner:rgba(237,216,144,.5);--rc-dev:rgba(64,120,220,.5);--rc-admin:rgba(184,68,46,.5);--rc-mod:rgba(40,160,140,.5);--rc-artist:rgba(140,60,200,.5);--rc-staff:rgba(180,170,150,.2);}`;
+  document.head.appendChild(s);
+})();
 
 async function addStaffMember(){
   const name=document.getElementById('s-name').value.trim();
@@ -1731,9 +1830,8 @@ async function removeStaff(idx){
 // ═══ FIREBASE LOAD ═══
 async function loadFirebaseData(){
   try{
-    const[config,sus,staff]=await Promise.all([
+    const[config,staff]=await Promise.all([
       fsRead('goldi','config'),
-      fsRead('goldi','suspensions'),
       fsRead('goldi','staff')
     ]);
     if(config){
@@ -1746,14 +1844,18 @@ async function loadFirebaseData(){
       fsConfig.supabaseUrl=config.supabaseUrl||'';
       fsConfig.supabaseKey=config.supabaseKey||'';
     }
-    if(sus&&Array.isArray(sus.data)){allSuspended=sus.data;fbLastUpdated=sus.lastUpdated||'';}
     if(staff&&Array.isArray(staff.members)){allStaff=staff.members;renderStaff(allStaff);}
     else renderStaff([]);
     document.getElementById('appeal-webhook').value=fsConfig.appealWebhook;
     document.getElementById('report-webhook').value=fsConfig.reportWebhook;
     const raw=sessionStorage.getItem(DUK);
     if(raw){try{const u=JSON.parse(raw);applyUser(u);checkAdmin(u.id);}catch{}}
-    if(fsConfig.supabaseUrl&&fsConfig.supabaseKey){fetchBotStats();setInterval(fetchBotStats,30000);}
+    if(fsConfig.supabaseUrl&&fsConfig.supabaseKey){
+      fetchBotStats();
+      setInterval(fetchBotStats,30000);
+      // Auto-sync suspensions on load
+      syncSuspensionsFromSupabase(true);
+    }
   }catch(e){showToast('error','DB ERROR','Could not load config.');}
   finally{
     const ov=document.getElementById('fb-loading');if(ov)ov.style.display='none';
@@ -1761,8 +1863,6 @@ async function loadFirebaseData(){
       const banner=document.getElementById('admin-locked-banner');
       if(banner){banner.style.display='block';updateBanner();}
     }
-    const dateEl=document.getElementById('sus-last-updated');
-    if(dateEl&&fbLastUpdated)dateEl.textContent='Last updated: '+fbLastUpdated;
   }
 }
 
@@ -1863,19 +1963,89 @@ async function saveAdminConfig(){
     document.getElementById('appeal-webhook').value=fsConfig.appealWebhook||'';
     document.getElementById('report-webhook').value=fsConfig.reportWebhook||'';
     showToast('success','SAVED','Config saved — active on all devices instantly.');
-    if(su&&sk){fetchBotStats();setInterval(fetchBotStats,30000);}
+    if(su&&sk){
+      fsConfig.supabaseUrl=su;fsConfig.supabaseKey=sk;
+      fetchBotStats();setInterval(fetchBotStats,30000);
+      syncSuspensionsFromSupabase(false);
+    }
   }catch(e){showToast('error','FAILED',e.message);}
 }
 
 // ═══ SUSPENDED TAB ═══
+let autoSyncInterval=null;
+
+async function syncSuspensionsFromSupabase(silent=false){
+  if(!fsConfig.supabaseUrl||!fsConfig.supabaseKey){
+    if(!silent)showToast('error','NOT CONFIGURED','Add Supabase URL and Key in the config section below.');
+    return;
+  }
+  const btn=document.getElementById('sync-btn');
+  const dot=document.getElementById('sus-sync-dot');
+  const lbl=document.getElementById('sus-sync-label');
+  const sub=document.getElementById('sus-sync-sub');
+  if(btn){btn.textContent='↻ SYNCING…';btn.disabled=true;}
+  if(dot)dot.style.background='var(--gold-light)';
+  try{
+    const res=await fetch(
+      `${fsConfig.supabaseUrl}/rest/v1/suspensions?select=user_id,reason,issued_by,issued_at,expires_at&order=issued_at.desc`,
+      {headers:{'apikey':fsConfig.supabaseKey,'Authorization':'Bearer '+fsConfig.supabaseKey},
+       signal:AbortSignal.timeout(10000)}
+    );
+    if(!res.ok)throw new Error('HTTP '+res.status+' — check table name is "suspensions" and RLS allows anon reads');
+    const rows=await res.json();
+    allSuspended=rows;
+    fbLastUpdated=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const dateEl=document.getElementById('sus-last-updated');
+    if(dateEl)dateEl.textContent='Last synced: '+fbLastUpdated;
+    if(dot)dot.style.background='var(--success)';
+    if(lbl)lbl.textContent=`${rows.length} records synced`;
+    if(sub)sub.textContent='Last sync: '+new Date().toLocaleTimeString();
+    // If admin view is visible, re-render
+    if(document.getElementById('admin-view').style.display!=='none')renderAdminTable(allSuspended);
+    // If user is logged in, update their check
+    const raw=sessionStorage.getItem(DUK);
+    if(raw&&document.getElementById('user-view').style.display!=='none'){try{renderUserView(JSON.parse(raw));}catch{}}
+    if(!silent)showToast('success','SYNCED',`${rows.length} suspended users loaded from Supabase.`);
+  }catch(e){
+    if(dot)dot.style.background='var(--danger)';
+    if(lbl)lbl.textContent='Sync failed';
+    if(sub)sub.textContent=e.message;
+    if(!silent)showToast('error','SYNC FAILED',e.message);
+    console.error('Suspension sync:',e);
+  }finally{
+    if(btn){btn.textContent='↻ SYNC NOW';btn.disabled=false;}
+  }
+}
+
+function startAutoSync(){
+  if(autoSyncInterval){
+    clearInterval(autoSyncInterval);
+    autoSyncInterval=null;
+    const btn=document.getElementById('auto-sync-btn');
+    if(btn){btn.textContent='⏱ AUTO SYNC';btn.style.color='';}
+    showToast('success','AUTO SYNC OFF','Automatic sync stopped.');
+    return;
+  }
+  if(!fsConfig.supabaseUrl||!fsConfig.supabaseKey){
+    showToast('error','NOT CONFIGURED','Add Supabase credentials first.');
+    return;
+  }
+  autoSyncInterval=setInterval(()=>syncSuspensionsFromSupabase(true),60000);
+  const btn=document.getElementById('auto-sync-btn');
+  if(btn){btn.textContent='⏱ AUTO: ON';btn.style.color='var(--success)';}
+  syncSuspensionsFromSupabase(false);
+  showToast('success','AUTO SYNC ON','Syncing every 60 seconds.');
+}
+
 function initSuspendedTab(){
   const dateEl=document.getElementById('sus-last-updated');
-  if(dateEl&&fbLastUpdated)dateEl.textContent='Last updated: '+fbLastUpdated;
+  if(dateEl&&fbLastUpdated)dateEl.textContent='Last synced: '+fbLastUpdated;
   if(isAdmin()){
     showAdminPanel();
     document.getElementById('user-view').style.display='none';
     document.getElementById('admin-view').style.display='block';
     if(allSuspended.length>0)renderAdminTable(allSuspended);
+    else syncSuspensionsFromSupabase(true);
   }else{
     document.getElementById('admin-locked-banner').style.display='block';
     updateBanner();
@@ -1888,29 +2058,11 @@ function initSuspendedTab(){
       document.getElementById('sus-user-result').style.display='none';
       document.getElementById('sus-login-prompt').style.display='flex';
     }
+    // Sync quietly so user check works even without admin
+    if(fsConfig.supabaseUrl&&fsConfig.supabaseKey&&!allSuspended.length){
+      syncSuspensionsFromSupabase(true);
+    }
   }
-}
-function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag-over');}
-function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processJson(f);}
-function handleFileUpload(e){const f=e.target.files[0];if(f)processJson(f);}
-function processJson(file){
-  if(!file.name.endsWith('.json'))return showToast('error','WRONG FILE','Please upload a .json file.');
-  const reader=new FileReader();
-  reader.onload=async(e)=>{
-    try{
-      const data=JSON.parse(e.target.result);
-      let list=Array.isArray(data)?data:data.suspensions||data.users||data.data;
-      if(!list)throw new Error('Expected {suspensions:[...]}');
-      const now=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-      showToast('success','UPLOADING…',`Saving ${list.length} records…`);
-      await fsWrite('goldi','suspensions',{data:list,lastUpdated:now});
-      allSuspended=list;fbLastUpdated=now;
-      document.getElementById('sus-last-updated').textContent='Last updated: '+now;
-      renderAdminTable(allSuspended);
-      showToast('success','DONE',`${list.length} users saved to database.`);
-    }catch(err){showToast('error','PARSE ERROR',err.message);}
-  };
-  reader.readAsText(file);
 }
 function filterSuspended(){
   const q=document.getElementById('sus-search').value.toLowerCase();
